@@ -1,6 +1,64 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+
+    <LinearLayout
+        android:id="@+id/header"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/back"
+            android:layout_width="114dp"
+            android:layout_height="match_parent"
+            android:layout_gravity="left"
+            android:onClick="goBackDir"
+            android:text="Back" />
+
+        <TextView
+            android:id="@+id/dirName"
+            android:layout_width="103dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="TextView" />
+    </LinearLayout>
+    <LinearLayout
+        android:id="@+id/footer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_alignParentBottom="true">
+
+        <TextView
+            android:id="@+id/noSelectedFile"
+            android:layout_width="339dp"
+            android:layout_height="match_parent"
+            android:onClick="goBackDir"
+            android:text="0 files selected"
+            android:textAlignment="center"
+            android:textSize="20sp"/>
+
+        <TextView
+            android:id="@+id/send"
+            android:layout_width="75dp"
+            android:layout_height="match_parent"
+            android:layout_gravity="center"
+            android:text="Send"
+            android:textSize="17sp"/>
+
+    </LinearLayout>
+
+    <ListView
+        android:id="@android:id/list"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/header"
+        android:layout_above="@id/footer"/>
+
 
 </RelativeLayout>
+

@@ -1,6 +1,7 @@
 package com.dakshit.file_sharing;
 
 import android.app.ListActivity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Environment;
 import android.view.View;
@@ -19,7 +20,7 @@ public class ShowFiles extends ListActivity {
     protected ArrayAdapter<String> listOfFileAdapter;
     private File root=new File(Environment.getExternalStorageDirectory().getAbsolutePath());
     private List<String> listOfFiles=new ArrayList<String>();
-    private Set<String> selectedFilesSet=new HashSet();
+    private HashSet<String> selectedFilesSet=new HashSet();
     private TextView fileCountView;
     @Override
     protected void onCreate(Bundle savedInstanceState){
@@ -76,5 +77,11 @@ public class ShowFiles extends ListActivity {
         selectedFilesSet.clear();
         fileCountView.setText(selectedFilesSet.size()+" files selected");
         refreshList();
+    }
+    public void connect(View view){
+        Intent connect=new Intent(this, Connect.class);
+        connect.putExtra("fileList", selectedFilesSet);
+        startActivity(connect);
+
     }
 }

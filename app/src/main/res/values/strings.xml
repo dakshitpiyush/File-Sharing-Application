@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">File-Sharing</string>
+    <string name="retry">Retry</string>
 </resources>

@@ -4,17 +4,21 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 
 import android.Manifest;
+import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
+import android.net.NetworkInfo;
 import android.net.wifi.WifiManager;
+import android.net.wifi.p2p.WifiP2pConfig;
 import android.net.wifi.p2p.WifiP2pDevice;
 import android.net.wifi.p2p.WifiP2pDeviceList;
 import android.net.wifi.p2p.WifiP2pManager;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
@@ -33,8 +37,9 @@ public class Connect extends AppCompatActivity {
     private IntentFilter intentFilter;
     private ListView peerList;
     private Button retry;
-    private TextView message;
+    public TextView message;
     private ArrayAdapter<String> listAdapter;
+    public ArrayList<String> deviceList = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -82,19 +87,47 @@ public class Connect extends AppCompatActivity {
                 message.setText("searching fails, Retry");
             }
         });
-    }
+        peerList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                WifiP2pConfig config = new WifiP2pConfig();
+                config.deviceAddress = deviceList.get(position);
+                if (ActivityCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                    ActivityCompat.requestPermissions((Activity) getApplicationContext(), new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 2);
+                }
+                wifiP2pManager.connect(channel, config, new WifiP2pManager.ActionListener() {
+                    @Override
+                    public void onSuccess() {
+                        //message.setText("sucsess Fully connected to "+parent.getItemAtPosition(position));
+                    }
 
+                    @Override
+                    public void onFailure(int reason) {
+                        String getRes;
+                        if (reason == WifiP2pManager.P2P_UNSUPPORTED)
+                            getRes = "device is unsupported";
+                        else if (reason == wifiP2pManager.BUSY) getRes = "device is busy";
+                        else getRes = "unknown error occured try again";
+                        message.setText("Fail to connect device " + getRes);
+                    }
+                });
+
+            }
+        });
+    }
 
     public WifiP2pManager.PeerListListener peerListListener = new WifiP2pManager.PeerListListener() {
         @Override
         public void onPeersAvailable(WifiP2pDeviceList peers) {
             List<String> deviceNameList = new ArrayList();
-            for (WifiP2pDevice device : peers.getDeviceList())
+            for (WifiP2pDevice device : peers.getDeviceList()) {
                 deviceNameList.add(device.deviceName);
+                deviceList.add(device.deviceAddress);
+            }
 
             listAdapter = new ArrayAdapter(getApplicationContext(), android.R.layout.simple_list_item_1, deviceNameList);
             peerList.setAdapter(listAdapter);
-            message.setText(String.valueOf(deviceNameList));
+
         }
     };
 
@@ -137,7 +170,14 @@ class WifiDirectBroadcastReceiver extends BroadcastReceiver {
                 ActivityCompat.requestPermissions(activity, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 2);
             }
             wifiP2pManager.requestPeers(channel, activity.peerListListener);
-        }else if(WifiP2pManager.WIFI_P2P_CONNECTION_CHANGED_ACTION.equals(action)){
+        }else if(WifiP2pManager.WIFI_P2P_CONNECTION_CHANGED_ACTION.equals(action)) {
+            if (wifiP2pManager == null) return;
+            NetworkInfo networkInf = intent.getParcelableExtra(WifiP2pManager.EXTRA_NETWORK_INFO);
+            if (networkInf.isConnected()) {
+                activity.message.setText("connected");
+            } else {
+                activity.message.setText("Disconnected");
+            }
 
         }else if(WifiP2pManager.WIFI_P2P_THIS_DEVICE_CHANGED_ACTION.equals(action)){
 

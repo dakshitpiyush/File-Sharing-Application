@@ -18,6 +18,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.FileSharing">
+        <activity android:name=".Recieve"></activity>
         <activity android:name=".Connect" />
         <activity android:name=".MainActivity">
             <intent-filter>

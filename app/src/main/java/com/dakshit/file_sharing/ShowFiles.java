@@ -18,18 +18,19 @@ import java.util.Set;
 public class ShowFiles extends ListActivity {
     protected File curDirectory;
     protected ArrayAdapter<String> listOfFileAdapter;
-    private File root=new File(Environment.getExternalStorageDirectory().getAbsolutePath());
-    private List<String> listOfFiles=new ArrayList<String>();
-    private HashSet<String> selectedFilesSet=new HashSet();
+    private File root = new File(Environment.getExternalStorageDirectory().getAbsolutePath());
+    private List<String> listOfFiles = new ArrayList<String>();
+    private ArrayList<String> selectedFilesSet = new ArrayList<>();
     private TextView fileCountView;
+
     @Override
-    protected void onCreate(Bundle savedInstanceState){
+    protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         //LayoutInflater inflator = (LayoutInflater)getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         setContentView(R.layout.filelist);
-        fileCountView=findViewById(R.id.noSelectedFile);
-        curDirectory=root;
-        for(String listItem:curDirectory.list()){
+        fileCountView = findViewById(R.id.noSelectedFile);
+        curDirectory = root;
+        for (String listItem : curDirectory.list()) {
             listOfFiles.add(listItem);
         }
         listOfFileAdapter = new ArrayAdapter(this, android.R.layout.simple_list_item_1, listOfFiles);

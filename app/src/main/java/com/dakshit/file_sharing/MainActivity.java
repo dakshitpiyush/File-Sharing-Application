@@ -32,53 +32,25 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         requestPermission(Manifest.permission.READ_EXTERNAL_STORAGE);
         requestPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE);
+        requestPermission(Manifest.permission.ACCESS_FINE_LOCATION);
+        requestPermission(Manifest.permission.CHANGE_WIFI_STATE);
     }
 
-    public void sendFile(View view) {
+    public void sendReceiveFile(View view) {
         if (requestPermission(Manifest.permission.READ_EXTERNAL_STORAGE)) {
-            Intent selectFileIntent = new Intent(this, ShowFiles.class);
-            startActivity(selectFileIntent);
+            if (view.getId() == R.id.btnSend) {
+                Intent selectFileIntent = new Intent(this, ShowFiles.class);
+                startActivity(selectFileIntent);
+            } else if (view.getId() == R.id.btnRecive) {
+                Intent receiveFileIntent = new Intent(this, Recieve.class);
+                startActivity(receiveFileIntent);
+            }
         } else {
             TextView forTest = findViewById(R.id.test);
             forTest.setText("you do not have permission");
         }
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.O)
-    public void startHotspot(View view) {
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 5);
-            return;
-        }
-        wifiManager = (WifiManager) getApplicationContext().getSystemService(this.WIFI_SERVICE);
-        wifiManager.startLocalOnlyHotspot(new WifiManager.LocalOnlyHotspotCallback() {
-            @Override
-            public void onStarted(WifiManager.LocalOnlyHotspotReservation reservation) {
-                super.onStarted(reservation);
-                hotspotReservation = reservation;
-                currentConfig = hotspotReservation.getWifiConfiguration();
-
-                Log.v("DANG", "THE PASSWORD IS: "
-                        + currentConfig.preSharedKey
-                        + " \n SSID is : "
-                        + currentConfig.SSID);
-
-            }
-
-            @Override
-            public void onStopped() {
-                super.onStopped();
-                Log.v("DANG", "Local Hotspot Stopped");
-            }
-
-            @Override
-            public void onFailed(int reason) {
-                super.onFailed(reason);
-                Log.v("DANG", "Local Hotspot failed to start");
-            }
-
-        }, new Handler());
-    }
 
     //request for permissions
     private boolean requestPermission(String resource) {

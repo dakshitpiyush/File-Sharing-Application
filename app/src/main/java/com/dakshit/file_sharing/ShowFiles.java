@@ -18,7 +18,7 @@ import java.util.Set;
 public class ShowFiles extends ListActivity {
     protected File curDirectory;
     protected ArrayAdapter<String> listOfFileAdapter;
-    private File root = new File(Environment.getExternalStorageDirectory().getAbsolutePath());
+    private File root;
     private List<String> listOfFiles = new ArrayList<String>();
     private ArrayList<String> selectedFilesSet = new ArrayList<>();
     private TextView fileCountView;
@@ -26,9 +26,9 @@ public class ShowFiles extends ListActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        //LayoutInflater inflator = (LayoutInflater)getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         setContentView(R.layout.filelist);
         fileCountView = findViewById(R.id.noSelectedFile);
+        root = new File(Environment.getExternalStorageDirectory().getAbsolutePath());
         curDirectory = root;
         for (String listItem : curDirectory.list()) {
             listOfFiles.add(listItem);

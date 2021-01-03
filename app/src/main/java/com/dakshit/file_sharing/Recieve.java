@@ -40,17 +40,35 @@ public class Recieve extends AppCompatActivity {
         message = (TextView) findViewById(R.id.tvRecived);
 
         wifiManager = (WifiManager) getApplicationContext().getSystemService(this.WIFI_SERVICE);
-        wifiP2pManager = (WifiP2pManager) getApplicationContext().getSystemService(this.WIFI_P2P_SERVICE);
         wifiManager.setWifiEnabled(true);
+        wifiP2pManager = (WifiP2pManager) getApplicationContext().getSystemService(this.WIFI_P2P_SERVICE);
+        channel = wifiP2pManager.initialize(this, getMainLooper(), null);
+
 
         intentFilter = new IntentFilter();
         intentFilter.addAction(WifiP2pManager.WIFI_P2P_STATE_CHANGED_ACTION);
         intentFilter.addAction(WifiP2pManager.WIFI_P2P_CONNECTION_CHANGED_ACTION);
         intentFilter.addAction(WifiP2pManager.WIFI_P2P_THIS_DEVICE_CHANGED_ACTION);
 
-        WifiBroadcastReciever wifiBroadcastReciever = new WifiBroadcastReciever(wifiManager, wifiP2pManager, this);
+        WifiBroadcastReciever wifiBroadcastReciever = new WifiBroadcastReciever(wifiP2pManager, channel, this);
 
         registerReceiver(wifiBroadcastReciever, intentFilter);
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 2);
+        }
+        wifiP2pManager.discoverPeers(channel, new WifiP2pManager.ActionListener() {
+
+            @Override
+            public void onSuccess() {
+                message.setText("Sucsess");
+            }
+
+            @Override
+            public void onFailure(int reason) {
+                message.setText("searching fails, Retry");
+            }
+        });
+
     }
 
     WifiP2pManager.ConnectionInfoListener connectionInfoListener = new WifiP2pManager.ConnectionInfoListener() {
@@ -96,11 +114,11 @@ public class Recieve extends AppCompatActivity {
 
     private class WifiBroadcastReciever extends BroadcastReceiver {
         private Recieve activity;
-        private WifiManager wifiManager;
         private WifiP2pManager wifiP2pManager;
+        private WifiP2pManager.Channel channel;
 
-        public WifiBroadcastReciever(WifiManager wifiManager, WifiP2pManager wifiP2pManager, Recieve activity) {
-            this.wifiManager = wifiManager;
+        public WifiBroadcastReciever(WifiP2pManager wifiP2pManager, WifiP2pManager.Channel channel, Recieve activity) {
+            this.channel = channel;
             this.wifiP2pManager = wifiP2pManager;
             this.activity = activity;
         }

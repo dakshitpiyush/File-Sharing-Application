@@ -1,8 +1,5 @@
 package com.dakshit.file_sharing;
 
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
-
 import android.Manifest;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -17,12 +14,8 @@ import android.os.Bundle;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import java.io.IOException;
-import java.net.InetAddress;
-import java.net.InetSocketAddress;
-import java.net.ServerSocket;
-import java.net.Socket;
-import java.util.ArrayList;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
 
 public class Recieve extends AppCompatActivity {
 
@@ -74,45 +67,13 @@ public class Recieve extends AppCompatActivity {
     WifiP2pManager.ConnectionInfoListener connectionInfoListener = new WifiP2pManager.ConnectionInfoListener() {
         @Override
         public void onConnectionInfoAvailable(WifiP2pInfo info) {
-            final InetAddress groupOwnerAddress = info.groupOwnerAddress;
-            startSession(groupOwnerAddress, info);
+            Session session = new Session(info, null);
+            session.start();
         }
     };
 
-    public void startSession(InetAddress groupOwner, WifiP2pInfo info) {
-        Socket socket = null;
-        try {
-            if (info.groupFormed && info.isGroupOwner) {
-                ServerSocket serverSocket = new ServerSocket(8888);
-                socket = serverSocket.accept();
-            } else {
-                socket = new Socket();
-                socket.connect(new InetSocketAddress(groupOwner.getHostName(), 8888), 500);
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        SendReciveFile sendReciveFile = new SendReciveFile(socket);
-        if (sendReciveFile.status) {
-            sendReciveFile.start();
 
-            Intent parentIntent = getIntent();
-            if (parentIntent.hasExtra("fileList")) {
-                ArrayList<String> fileList = (ArrayList) parentIntent.getParcelableArrayListExtra("fileList");
-                for (int i = 0; i < fileList.size(); i++) {
-                    String url = fileList.get(i);
-                    if (!sendReciveFile.send(url)) {
-                        message.setText(message.getText() + "\npromblem while " + url + "transferred");
-                    } else {
-                        message.setText(message.getText() + "\nfile having url " + url + "transferred");
-                    }
-                }
-            }
-        }
-
-    }
-
-    private class WifiBroadcastReciever extends BroadcastReceiver {
+    private static class WifiBroadcastReciever extends BroadcastReceiver {
         private Recieve activity;
         private WifiP2pManager wifiP2pManager;
         private WifiP2pManager.Channel channel;

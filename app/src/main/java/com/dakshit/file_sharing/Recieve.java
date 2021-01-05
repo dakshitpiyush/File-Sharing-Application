@@ -11,9 +11,12 @@ import android.net.wifi.WifiManager;
 import android.net.wifi.p2p.WifiP2pInfo;
 import android.net.wifi.p2p.WifiP2pManager;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 
@@ -64,10 +67,28 @@ public class Recieve extends AppCompatActivity {
 
     }
 
+    public Handler handler = new Handler(new Handler.Callback() {
+        @Override
+        public boolean handleMessage(@NonNull Message msg) {
+            String fileName;
+            switch (msg.what) {
+                case 1:
+                    fileName = (String) msg.obj;
+                    message.setText("seneding fails of file" + fileName);
+                    break;
+                case 2:
+                    fileName = (String) msg.obj;
+                    message.setText("seneding sucsess file" + fileName);
+                    break;
+            }
+            return true;
+        }
+    });
+
     WifiP2pManager.ConnectionInfoListener connectionInfoListener = new WifiP2pManager.ConnectionInfoListener() {
         @Override
         public void onConnectionInfoAvailable(WifiP2pInfo info) {
-            Session session = new Session(info, null);
+            Session session = new Session(info, null, handler);
             session.start();
         }
     };

@@ -10,47 +10,63 @@
         android:id="@+id/header"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        android:overScrollMode="ifContentScrolls"
+        android:padding="10dp">
 
-        <TextView
+<!--        <TextView-->
+<!--            android:id="@+id/back"-->
+<!--            android:layout_width="71dp"-->
+<!--            android:layout_height="match_parent"-->
+<!--            android:layout_gravity="left"-->
+<!--            android:onClick="goBackDir"-->
+<!--            android:text="<" />-->
+        <ImageView
             android:id="@+id/back"
-            android:layout_width="114dp"
-            android:layout_height="match_parent"
-            android:layout_gravity="left"
-            android:onClick="goBackDir"
-            android:text="Back" />
-
-        <TextView
-            android:id="@+id/dirName"
-            android:layout_width="103dp"
-            android:layout_height="wrap_content"
+            android:layout_width="43dp"
+            android:layout_height="25dp"
             android:layout_gravity="center"
-            android:text="TextView" />
+            android:onClick="goBackDir"
+            android:src="@drawable/back" />
+
+
+            <TextView
+                android:id="@+id/dirName"
+                android:layout_width="292dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:isScrollContainer="true"
+                android:overScrollMode="ifContentScrolls"
+                android:singleLine="true"
+                android:ellipsize="end"
+                android:text="textview"/>
+
     </LinearLayout>
     <LinearLayout
         android:id="@+id/footer"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:layout_alignParentBottom="true">
+        android:layout_alignParentBottom="true"
+        android:padding="10dp"
+        android:paddingBottom="0px">
 
         <TextView
             android:id="@+id/noSelectedFile"
-            android:layout_width="339dp"
+            android:layout_width="300dp"
             android:layout_height="match_parent"
             android:onClick="goBackDir"
             android:text="0 files selected"
             android:textAlignment="center"
-            android:textSize="20sp"/>
+            android:paddingTop="5dp"
+            android:textSize="20sp" />
 
-        <TextView
+        <ImageView
             android:id="@+id/send"
-            android:layout_width="75dp"
-            android:layout_height="match_parent"
-            android:layout_gravity="center"
-            android:text="Send"
+            android:layout_width="wrap_content"
+            android:layout_height="45dp"
             android:onClick="connect"
-            android:textSize="17sp" />
+            android:src="@drawable/send" />
 
     </LinearLayout>
 

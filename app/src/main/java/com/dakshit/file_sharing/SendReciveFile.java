@@ -1,6 +1,8 @@
 package com.dakshit.file_sharing;
 
 import android.os.Environment;
+import android.os.Handler;
+import android.os.Message;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -21,9 +23,11 @@ public class SendReciveFile extends Thread {
     private DataInputStream dis;
     public static final int BUFFER_SIZE = 4096;  //4kb at time
     private static final String PARENT_FOLDER = Environment.getExternalStorageDirectory().getAbsolutePath() + "/fileSharing";
+    private Handler handler;
 
-    public SendReciveFile(Socket sock) {
+    public SendReciveFile(Socket sock, Handler handler) {
         this.socket = sock;
+        this.handler = handler;
         status = socket != null;
         try {
             if (status) {
@@ -57,6 +61,8 @@ public class SendReciveFile extends Thread {
                 while ((bytes = inputStream.read(data, 0, (int) (Math.min(fileSize, BUFFER_SIZE)))) > 0) {
                     fileSize -= bytes;
                     fos.write(data, 0, bytes);
+                    Message msg = handler.obtainMessage(3, fileName);
+                    msg.sendToTarget();
                 }
                 fos.close();
                 dos.writeBoolean(true);
@@ -80,11 +86,15 @@ public class SendReciveFile extends Thread {
 
             while (fis.read(data) > 0) {
                 outputStream.write(data);
+                Message msg = handler.obtainMessage(3, fileName);
+                msg.setTarget(handler);
+                msg.sendToTarget();
             }
+
             isSucssesTransfer = dis.readBoolean();
             fis.close();
         } catch (IOException e) {
-
+            e.printStackTrace();
         }
         return isSucssesTransfer;
     }

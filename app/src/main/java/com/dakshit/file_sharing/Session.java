@@ -34,7 +34,7 @@ public class Session extends Thread {
                 //todo:decide best statergy to avoid port already used situation
                 socket.connect(new InetSocketAddress(info.groupOwnerAddress.getHostName(), 8000), 1000);
             }
-            SendReciveFile sendReciveFile = new SendReciveFile(socket);
+            SendReciveFile sendReciveFile = new SendReciveFile(socket, handler);
             if (sendReciveFile.status) {
                 sendReciveFile.start();
                 if (selectedFileList != null) {

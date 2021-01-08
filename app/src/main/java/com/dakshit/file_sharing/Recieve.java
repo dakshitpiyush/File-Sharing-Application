@@ -27,6 +27,42 @@ public class Recieve extends AppCompatActivity {
     private WifiP2pManager.Channel channel;
     private IntentFilter intentFilter;
     private TextView message;
+    public Handler handler = new Handler(new Handler.Callback() {
+        @Override
+        public boolean handleMessage(@NonNull Message msg) {
+            String fileName;
+            switch (msg.what) {
+                case 1:
+                    fileName = (String) msg.obj;
+                    message.setText("seneding fails of file" + fileName);
+                    break;
+                case 2:
+                    fileName = (String) msg.obj;
+                    message.setText("seneding sucsess file" + fileName);
+                    break;
+                case 3:
+                    //sended part of data
+                    fileName = (String) msg.obj;
+                    break;
+                case 4:
+                    //recieved some part of data
+                    fileName = (String) msg.obj;
+                    break;
+
+            }
+            return true;
+        }
+    });
+    WifiP2pManager.ConnectionInfoListener connectionInfoListener = new WifiP2pManager.ConnectionInfoListener() {
+        @Override
+        public void onConnectionInfoAvailable(WifiP2pInfo info) {
+            Session session = new Session(info, null, handler);
+            session.start();
+            //todo: after sharing work done connection should destroyed
+
+        }
+    };
+    private WifiBroadcastReciever wifiBroadcastReciever;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,7 +82,7 @@ public class Recieve extends AppCompatActivity {
         intentFilter.addAction(WifiP2pManager.WIFI_P2P_CONNECTION_CHANGED_ACTION);
         intentFilter.addAction(WifiP2pManager.WIFI_P2P_THIS_DEVICE_CHANGED_ACTION);
 
-        WifiBroadcastReciever wifiBroadcastReciever = new WifiBroadcastReciever(wifiP2pManager, channel, this);
+        wifiBroadcastReciever = new WifiBroadcastReciever(wifiP2pManager, channel, this);
 
         registerReceiver(wifiBroadcastReciever, intentFilter);
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
@@ -67,31 +103,17 @@ public class Recieve extends AppCompatActivity {
 
     }
 
-    public Handler handler = new Handler(new Handler.Callback() {
-        @Override
-        public boolean handleMessage(@NonNull Message msg) {
-            String fileName;
-            switch (msg.what) {
-                case 1:
-                    fileName = (String) msg.obj;
-                    message.setText("seneding fails of file" + fileName);
-                    break;
-                case 2:
-                    fileName = (String) msg.obj;
-                    message.setText("seneding sucsess file" + fileName);
-                    break;
-            }
-            return true;
-        }
-    });
+    @Override
+    protected void onResume() {
+        super.onResume();
+        registerReceiver(wifiBroadcastReciever, intentFilter);
+    }
 
-    WifiP2pManager.ConnectionInfoListener connectionInfoListener = new WifiP2pManager.ConnectionInfoListener() {
-        @Override
-        public void onConnectionInfoAvailable(WifiP2pInfo info) {
-            Session session = new Session(info, null, handler);
-            session.start();
-        }
-    };
+    @Override
+    protected void onPause() {
+        super.onPause();
+        registerReceiver(wifiBroadcastReciever, intentFilter);
+    }
 
 
     private static class WifiBroadcastReciever extends BroadcastReceiver {

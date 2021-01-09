@@ -3,8 +3,12 @@ package com.dakshit.file_sharing;
 import android.app.Activity;
 import android.app.ListActivity;
 import android.content.Intent;
+import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
+import android.provider.OpenableColumns;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,7 +17,10 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import androidx.annotation.Nullable;
+
 import java.io.File;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -30,29 +37,89 @@ public class ShowFiles extends ListActivity {
     private TextView fileCountView;
     ArrayList<String > subs;
     ArrayList<String> filenames=new ArrayList<>();
+    private String[] allpath;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+//        super.onCreate(savedInstanceState);
+//        setContentView(R.layout.filelist);
+//        fileCountView = findViewById(R.id.noSelectedFile);
+//        root = new File(getApplicationContext().getExternalFilesDirs("")[0].getAbsolutePath());
+//        directoryPath=findViewById(R.id.dirName);
+//
+//        curDirectory = root;
+//
+//        directoryPath.setText(curDirectory.getPath());
+//
+//        for (File listItem : curDirectory.listFiles()) {
+//            listOfFiles.add(listItem);
+//            filenames.add(listItem.getName());
+//        }
+//        subs = new ArrayList<>();
+//        for(int i = 0 ;i < curDirectory.length();i++){
+//            subs.add("piyush");
+//        }
+//        listOfFileAdapter = new MyListAdapter(this, listOfFiles, subs, filenames);
+//        setListAdapter(listOfFileAdapter);
+
+
+//        Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+//        intent.addCategory(Intent.CATE);
+//        intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION);
+//        intent.setType("application/*");
+//        String[] mimeTypes = new String[]{"application/x-binary,application/octet-stream"};
+//        if (mimeTypes.length > 0) {
+//            intent.putExtra(Intent.EXTRA_MIME_TYPES, mimeTypes);
+//        }
+//
+//        startActivity(intent,);
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.filelist);
-        fileCountView = findViewById(R.id.noSelectedFile);
-        root = new File(Environment.getExternalStorageDirectory().getAbsolutePath());
-        directoryPath=findViewById(R.id.dirName);
-
-        curDirectory = root;
-
-        directoryPath.setText(curDirectory.getPath());
-
-        for (File listItem : curDirectory.listFiles()) {
-            listOfFiles.add(listItem);
-            filenames.add(listItem.getName());
-        }
-        subs = new ArrayList<>();
-        for(int i = 0 ;i < curDirectory.length();i++){
-            subs.add("piyush");
-        }
-        listOfFileAdapter = new MyListAdapter(this, listOfFiles, subs, filenames);
-        setListAdapter(listOfFileAdapter);
+        Intent filesIntent;
+        filesIntent = new Intent(Intent.ACTION_GET_CONTENT);
+        filesIntent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
+        filesIntent.addCategory(Intent.CATEGORY_OPENABLE);
+        filesIntent.setType("*/*");  //use image/* for photos, etc.
+        startActivityForResult(filesIntent, 1001);
     }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        if (resultCode == RESULT_OK) {
+            switch (requestCode) {
+                case 1001:
+                    // Checking whether data is null or not
+                    if (data != null) {
+
+                        // Checking for selection multiple files or single.
+                        if (data.getClipData() != null){
+
+                            // Getting the length of data and logging up the logs using index
+                            for (int index = 0; index < data.getClipData().getItemCount(); index++) {
+
+                                // Getting the URIs of the selected files and logging them into logcat at debug level
+                                Uri uri = data.getClipData().getItemAt(index).getUri();
+                                /*
+                                 * Get the file's content URI from the incoming Intent,
+                                 * then query the server app to get the file's display name
+                                 * and size.
+                                 */
+                                String ss = FileUtils.getPath(getApplicationContext(), uri);
+                                File filee = new File(ss);
+                                boolean bool = filee.exists();
+                                String  m = "asach";
+
+                            }
+                        }else{
+
+                            // Getting the URI of the selected file and logging into logcat at debug level
+                            Uri uri = data.getData();
+                            Log.d("fileUri: ", String.valueOf(uri));
+                        }
+                    }
+                    break;
+            }
+        }
+    }
+
     private void refreshList(){
         listOfFiles.clear();
         filenames.clear();

@@ -13,17 +13,19 @@
         android:background="@color/black"
         android:onClick="discover"
         android:text="@string/retry"
-        app:layout_constraintBottom_toTopOf="@+id/listPeers"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@+id/tvMessage" />
 
     <ListView
         android:id="@+id/listPeers"
         android:layout_width="match_parent"
         android:layout_height="300dp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.426"
+        tools:layout_editor_absoluteX="94dp" />
 
     <TextView
         android:id="@+id/tvMessage"
@@ -32,7 +34,9 @@
         android:text="TextView"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/listPeers" />
+        app:layout_constraintTop_toBottomOf="@+id/listPeers"
+        app:layout_constraintVertical_bias="0.271" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

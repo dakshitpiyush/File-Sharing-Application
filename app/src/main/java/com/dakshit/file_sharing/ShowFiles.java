@@ -46,10 +46,6 @@ public class ShowFiles extends ListActivity {
             listOfFiles.add(listItem);
             filenames.add(listItem.getName());
         }
-        subs = new ArrayList<>();
-        for(int i = 0 ;i < curDirectory.length();i++){
-            subs.add("piyush");
-        }
         listOfFileAdapter = new MyListAdapter(this, listOfFiles, filenames);
         setListAdapter(listOfFileAdapter);
     }
@@ -140,7 +136,7 @@ public class ShowFiles extends ListActivity {
 
         public MyListAdapter(Activity context, ArrayList<File> maintitle, ArrayList<String> filenames) {
             super(context, R.layout.iconlist, filenames);
-            // TODO Auto-generated constructor stub
+            // TODO Auto-generated constructor stu
             this.context = context;
             this.maintitle = maintitle;
             this.filenames = filenames;

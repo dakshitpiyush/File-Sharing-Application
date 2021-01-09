@@ -28,15 +28,15 @@ public class ShowFiles extends ListActivity {
     private ArrayList<File> listOfFiles = new ArrayList();
     private HashSet<String> selectedFilesSet = new HashSet<>();
     private TextView fileCountView;
-    ArrayList<String > subs;
-    ArrayList<String> filenames=new ArrayList<>();
+    private ArrayList<String> filenames = new ArrayList<>();
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.filelist);
         fileCountView = findViewById(R.id.noSelectedFile);
         root = new File(Environment.getExternalStorageDirectory().getAbsolutePath());
-        directoryPath=findViewById(R.id.dirName);
+        directoryPath = findViewById(R.id.dirName);
 
         curDirectory = root;
 
@@ -103,7 +103,7 @@ public class ShowFiles extends ListActivity {
 
     }
 
-    class MyListAdapter extends ArrayAdapter<String> {
+    private class MyListAdapter extends ArrayAdapter<String> {
 
         private final Activity context;
         private final ArrayList<File> maintitle;
@@ -136,7 +136,6 @@ public class ShowFiles extends ListActivity {
 
         public MyListAdapter(Activity context, ArrayList<File> maintitle, ArrayList<String> filenames) {
             super(context, R.layout.iconlist, filenames);
-            // TODO Auto-generated constructor stu
             this.context = context;
             this.maintitle = maintitle;
             this.filenames = filenames;
@@ -180,7 +179,6 @@ public class ShowFiles extends ListActivity {
 
         }
 
-        ;
 
         private String getSize(File file) {
             double length = (double) file.length();
@@ -197,8 +195,3 @@ public class ShowFiles extends ListActivity {
     }
 
 }
-
-
-/*
-
- */

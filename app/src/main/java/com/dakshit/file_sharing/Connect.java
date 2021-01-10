@@ -15,8 +15,6 @@ import android.net.wifi.p2p.WifiP2pDeviceList;
 import android.net.wifi.p2p.WifiP2pInfo;
 import android.net.wifi.p2p.WifiP2pManager;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -25,7 +23,6 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 
@@ -134,34 +131,34 @@ public class Connect extends AppCompatActivity {
         }
     };
 
-    public Handler handler = new Handler(new Handler.Callback() {
-        @Override
-        public boolean handleMessage(@NonNull Message msg) {
-            String fileName;
-            switch (msg.what) {
-                case 1:
-                    fileName = (String) msg.obj;
-                    message.setText("sneding fails of file" + fileName);
-                    break;
-                case 2:
-                    fileName = (String) msg.obj;
-                    message.setText("sneding sucsess file" + fileName);
-                    break;
-            }
-            return true;
-        }
-    });
+//    public Handler handler = new Handler(new Handler.Callback() {
+//        @Override
+//        public boolean handleMessage(@NonNull Message msg) {
+//            String fileName;
+//            switch (msg.what) {
+//                case 1:
+//                    fileName = (String) msg.obj;
+//                    message.setText("sneding fails of file" + fileName);
+//                    break;
+//                case 2:
+//                    fileName = (String) msg.obj;
+//                    message.setText("sneding sucsess file" + fileName);
+//                    break;
+//            }
+//            return true;
+//        }
+//    });
 
     public WifiP2pManager.ConnectionInfoListener connectionInfoListener = new WifiP2pManager.ConnectionInfoListener() {
         @Override
         public void onConnectionInfoAvailable(WifiP2pInfo info) {
-            Intent parentIntent = getIntent();
+            Intent parentIntent = getIntent(), sharing = new Intent(getApplicationContext(), Sharing.class);
             ArrayList<String> selectedFileList = null;
             if (parentIntent.hasExtra("fileList"))
                 selectedFileList = parentIntent.getStringArrayListExtra("fileList");
-            Session session = new Session(info, selectedFileList, handler);
-            session.start();
-            //todo: after sharing work done connection should destroyed
+            sharing.putExtra("selectedFileList", selectedFileList);
+            sharing.putExtra("wifiP2pInfo", info);
+            startActivity(sharing);
         }
     };
 

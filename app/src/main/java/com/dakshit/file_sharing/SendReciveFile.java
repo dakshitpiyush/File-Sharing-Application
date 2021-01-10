@@ -56,13 +56,14 @@ public class SendReciveFile extends Thread {
             try {
                 long fileSize = dis.readLong();
                 String fileName = dis.readUTF();
+                FileR fileR = new FileR(fileName, fileSize);
+                handler.obtainMessage(2, fileR).sendToTarget();
                 File file = new File(PARENT_FOLDER + "/" + fileName);
                 FileOutputStream fos = new FileOutputStream(file);
                 while ((bytes = inputStream.read(data, 0, (int) (Math.min(fileSize, BUFFER_SIZE)))) > 0) {
                     fileSize -= bytes;
                     fos.write(data, 0, bytes);
-                    Message msg = handler.obtainMessage(3, fileName);
-                    msg.sendToTarget();
+                    handler.obtainMessage(3).sendToTarget();
                 }
                 fos.close();
                 dos.writeBoolean(true);
@@ -72,8 +73,7 @@ public class SendReciveFile extends Thread {
         }
     }
 
-    public boolean send(String url) {
-        File file = new File(url);
+    public boolean send(File file) {
         boolean isSucssesTransfer = false;
         if (!file.exists()) return false;
         try {
@@ -86,7 +86,7 @@ public class SendReciveFile extends Thread {
 
             while (fis.read(data) > 0) {
                 outputStream.write(data);
-                Message msg = handler.obtainMessage(3, fileName);
+                Message msg = handler.obtainMessage(4);
                 msg.setTarget(handler);
                 msg.sendToTarget();
             }

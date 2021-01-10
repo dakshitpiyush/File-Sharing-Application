@@ -6,20 +6,24 @@
     android:layout_height="match_parent"
     tools:context=".Recieve">
 
-    <ListView
-        android:id="@+id/listPeers"
-        android:layout_width="match_parent"
-        android:layout_height="300dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
     <TextView
         android:id="@+id/tvRecived"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="TextView"
-        tools:layout_editor_absoluteX="181dp"
-        tools:layout_editor_absoluteY="599dp" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        tools:layout_editor_absoluteY="123dp" />
+
+    <Button
+        android:id="@+id/btnRecRetry"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Retry"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="@+id/tvRecived"
+        app:layout_constraintStart_toStartOf="@+id/tvRecived"
+        app:layout_constraintTop_toBottomOf="@+id/tvRecived" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

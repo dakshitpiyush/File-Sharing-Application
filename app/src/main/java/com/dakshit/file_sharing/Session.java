@@ -34,25 +34,10 @@ public class Session extends Thread {
                 //todo:decide best statergy to avoid port already used situation
                 socket.connect(new InetSocketAddress(info.groupOwnerAddress.getHostName(), 8000), 1000);
             }
-            SendReciveFile sendReciveFile = new SendReciveFile(socket, handler);
-            if (sendReciveFile.status) {
-                sendReciveFile.start();
-                if (selectedFileList != null) {
-                    for (int i = 0; i < selectedFileList.size(); i++) {
-                        String url = selectedFileList.get(i);
-                        Message msg;
-                        if (sendReciveFile.send(url)) {
-                            msg = handler.obtainMessage(1, url);
-                        } else {
-                            msg = handler.obtainMessage(2, url);
-                        }
-                        msg.setTarget(handler);
-                        msg.sendToTarget();
-                    }
-                }
-            }
+            Message msg = handler.obtainMessage(1, socket);
+            msg.setTarget(handler);
+            msg.sendToTarget();
         } catch (IOException e) {
-            //todo:set an handler and show message via handler
             e.printStackTrace();
         }
     }

@@ -11,12 +11,10 @@ import android.net.wifi.WifiManager;
 import android.net.wifi.p2p.WifiP2pInfo;
 import android.net.wifi.p2p.WifiP2pManager;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
+import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 
@@ -27,42 +25,36 @@ public class Recieve extends AppCompatActivity {
     private WifiP2pManager.Channel channel;
     private IntentFilter intentFilter;
     private TextView message;
-    public Handler handler = new Handler(new Handler.Callback() {
-        @Override
-        public boolean handleMessage(@NonNull Message msg) {
-            String fileName;
-            switch (msg.what) {
-                case 1:
-                    fileName = (String) msg.obj;
-                    message.setText("seneding fails of file" + fileName);
-                    break;
-                case 2:
-                    fileName = (String) msg.obj;
-                    message.setText("seneding sucsess file" + fileName);
-                    break;
-                case 3:
-                    //sended part of data
-                    fileName = (String) msg.obj;
-                    break;
-                case 4:
-                    //recieved some part of data
-                    fileName = (String) msg.obj;
-                    break;
 
-            }
-            return true;
-        }
-    });
-    WifiP2pManager.ConnectionInfoListener connectionInfoListener = new WifiP2pManager.ConnectionInfoListener() {
-        @Override
-        public void onConnectionInfoAvailable(WifiP2pInfo info) {
-            Session session = new Session(info, null, handler);
-            session.start();
-            //todo: after sharing work done connection should destroyed
 
-        }
-    };
     private WifiBroadcastReciever wifiBroadcastReciever;
+    //  public Handler handler = new Handler(new Handler.Callback() {
+//        @Override
+//        public boolean handleMessage(@NonNull Message msg) {
+//            String fileName;
+//            switch (msg.what) {
+//                case 1:
+//                    fileName = (String) msg.obj;
+//                    message.setText("seneding fails of file" + fileName);
+//                    break;
+//                case 2:
+//                    fileName = (String) msg.obj;
+//                    message.setText("seneding sucsess file" + fileName);
+//                    break;
+//                case 3:
+//                    //sended part of data
+//                    fileName = (String) msg.obj;
+//                    break;
+//                case 4:
+//                    //recieved some part of data
+//                    fileName = (String) msg.obj;
+//                    break;
+//
+//            }
+//            return true;
+//        }
+//    });
+    private Button retry;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,6 +62,7 @@ public class Recieve extends AppCompatActivity {
         setContentView(R.layout.activity_recieve);
 
         message = (TextView) findViewById(R.id.tvRecived);
+        retry = (Button) findViewById(R.id.btnRecRetry);
 
         wifiManager = (WifiManager) getApplicationContext().getSystemService(this.WIFI_SERVICE);
         wifiManager.setWifiEnabled(true);
@@ -92,7 +85,7 @@ public class Recieve extends AppCompatActivity {
 
             @Override
             public void onSuccess() {
-                message.setText("Sucsess");
+                message.setText("Succsess, Waiting for Sender");
             }
 
             @Override
@@ -114,6 +107,15 @@ public class Recieve extends AppCompatActivity {
         super.onPause();
         registerReceiver(wifiBroadcastReciever, intentFilter);
     }
+
+    WifiP2pManager.ConnectionInfoListener connectionInfoListener = new WifiP2pManager.ConnectionInfoListener() {
+        @Override
+        public void onConnectionInfoAvailable(WifiP2pInfo info) {
+            Intent sharing = new Intent(getApplicationContext(), Sharing.class);
+            sharing.putExtra("wifiP2pInfo", info);
+            startActivity(sharing);
+        }
+    };
 
 
     private static class WifiBroadcastReciever extends BroadcastReceiver {

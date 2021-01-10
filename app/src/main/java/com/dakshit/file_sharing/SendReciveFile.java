@@ -37,7 +37,7 @@ public class SendReciveFile extends Thread {
                 dis = new DataInputStream(inputStream);
             }
         } catch (IOException e) {
-
+            e.printStackTrace();
         }
         File parent = new File(PARENT_FOLDER);
         if (!parent.exists()) {
@@ -56,46 +56,56 @@ public class SendReciveFile extends Thread {
             try {
                 long fileSize = dis.readLong();
                 String fileName = dis.readUTF();
+                FileR fileR = new FileR(fileName, fileSize);
+                Message msg = handler.obtainMessage(2, fileR);
+                msg.setTarget(handler);
+                msg.sendToTarget();
                 File file = new File(PARENT_FOLDER + "/" + fileName);
                 FileOutputStream fos = new FileOutputStream(file);
                 while ((bytes = inputStream.read(data, 0, (int) (Math.min(fileSize, BUFFER_SIZE)))) > 0) {
                     fileSize -= bytes;
                     fos.write(data, 0, bytes);
-                    Message msg = handler.obtainMessage(3, fileName);
-                    msg.sendToTarget();
+                    handler.obtainMessage(3).sendToTarget();
                 }
                 fos.close();
-                dos.writeBoolean(true);
+                //dos.writeBoolean(true);
             } catch (IOException e) {
 
             }
         }
     }
 
-    public boolean send(String url) {
-        File file = new File(url);
-        boolean isSucssesTransfer = false;
-        if (!file.exists()) return false;
-        try {
-            long fileSize = file.length();
-            String fileName = file.getName();
-            dos.writeLong(fileSize);
-            dos.writeUTF(fileName);
-            FileInputStream fis = new FileInputStream(file);
-            byte[] data = new byte[BUFFER_SIZE];
+    public void send(File file) {
+        new Thread() {
+            @Override
+            public void run() {
+                boolean isSucssesTransfer = false;
+                if (!file.exists()) return;
+                try {
+                    long fileSize = file.length();
+                    String fileName = file.getName();
+                    dos.writeLong(fileSize);
+                    dos.writeUTF(fileName);
+                    FileInputStream fis = new FileInputStream(file);
+                    byte[] data = new byte[BUFFER_SIZE];
 
-            while (fis.read(data) > 0) {
-                outputStream.write(data);
-                Message msg = handler.obtainMessage(3, fileName);
-                msg.setTarget(handler);
-                msg.sendToTarget();
+                    while (fis.read(data) > 0) {
+                        outputStream.write(data);
+                        Message msg = handler.obtainMessage(4);
+                        msg.setTarget(handler);
+                        msg.sendToTarget();
+                    }
+
+                    //isSucssesTransfer = dis.readBoolean();
+                    fis.close();
+                    Message msgS = handler.obtainMessage(5);
+                    msgS.setTarget(handler);
+                    msgS.sendToTarget();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
             }
-
-            isSucssesTransfer = dis.readBoolean();
-            fis.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return isSucssesTransfer;
+        }.start();
     }
 }

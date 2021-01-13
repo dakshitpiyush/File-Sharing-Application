@@ -131,6 +131,23 @@ public class Connect extends AppCompatActivity {
         }
     };
 
+    public Handler handler = new Handler(new Handler.Callback() {
+        @Override
+        public boolean handleMessage(@NonNull Message msg) {
+            String fileName;
+            switch (msg.what) {
+                case 1:
+                    fileName = (String) msg.obj;
+                    message.setText("sneding fails of file" + fileName);
+                    break;
+                case 2:
+                    fileName = (String) msg.obj;
+                    message.setText("sneding sucsess file" + fileName);
+                    break;
+            }
+            return true;
+        }
+    });
 
     public WifiP2pManager.ConnectionInfoListener connectionInfoListener = new WifiP2pManager.ConnectionInfoListener() {
         @Override

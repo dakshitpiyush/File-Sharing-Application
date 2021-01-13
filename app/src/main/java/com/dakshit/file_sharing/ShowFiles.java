@@ -147,7 +147,7 @@ public class ShowFiles extends ListActivity {
             LayoutInflater inflater = context.getLayoutInflater();
             View rowView = inflater.inflate(R.layout.iconlist, null, true);
             TextView titleText = (TextView) rowView.findViewById(R.id.title);
-            ImageView imageView = (ImageView) rowView.findViewById(R.id.icon);
+            ImageView imageView = (ImageView) rowView.findViewById(R.id.iconS);
             TextView subtitleText = (TextView) rowView.findViewById(R.id.subtitle);
             CheckBox checkBox = (CheckBox) rowView.findViewById(R.id.checkBox);
 

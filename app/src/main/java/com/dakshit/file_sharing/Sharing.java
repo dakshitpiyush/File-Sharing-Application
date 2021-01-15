@@ -2,7 +2,9 @@ package com.dakshit.file_sharing;
 
 import android.content.Intent;
 import android.net.wifi.p2p.WifiP2pInfo;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
 import android.view.LayoutInflater;
@@ -15,7 +17,16 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.InetSocketAddress;
+import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -49,13 +60,18 @@ public class Sharing extends AppCompatActivity {
     private ViewGroup scroll;
     private WifiP2pInfo info;
     private ArrayList<String> selectedFileList = null;
-    private Session session;
     private Handler handler;
-    private SendReciveFile sendReciveFile;
     private LayoutInflater layoutInflater;
     private int curSend = 0;
     private ArrayList<View> sendViewList = new ArrayList<>();
     private View curReceiveView;
+    public final int BUFFER_SIZE=4096;
+
+    public static final int SOCKET_CREATED=1;
+    public static final int FILE_RECEIVING=2;
+    public static final int FILE_SENT=3;
+    public static final int DATA_PART_RECEIVED=4;
+    public static final int DATA_PART_SENT=5;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,42 +87,160 @@ public class Sharing extends AppCompatActivity {
             @Override
             public boolean handleMessage(@NonNull Message msg) {
                 switch (msg.what) {
-                    case 1:
+                    case SOCKET_CREATED:
                         Socket socket = (Socket) msg.obj;
                         startSharing(socket);
                         break;
-                    case 2:
+                    case FILE_RECEIVING:
                         FileR fileR = (FileR) msg.obj;
                         receive(fileR.fileName, fileR.fileSize);
                         break;
-                    case 3:
+                    case FILE_SENT:
+                        //Todo: kaytari kara file gelyavar
+                        break;
+                    case DATA_PART_RECEIVED:
                         makeProgress(false);
                         break;
-                    case 4:
+                    case DATA_PART_SENT:
                         makeProgress(true);
                         break;
-                    case 5:
-                        curSend++;
-                        sendNext();
                 }
                 return true;
             }
 
         });
+        if(selectedFileList!=null)
+        for(int i=0; i<selectedFileList.size();i++){
+            drawSend(selectedFileList.get(i));
+        }
 
-        session = new Session(info, selectedFileList, handler);
+        Thread session=new Thread(){
+            @Override
+            public void run() {
+                Socket socket = null;
+                try {
+                    if (info.groupFormed && info.isGroupOwner) {
+                        ServerSocket sc = new ServerSocket(8000);
+                        socket = sc.accept();
+                    } else {
+                        socket = new Socket();
+                        //todo:decide best statergy to avoid port already used situation
+                        socket.connect(new InetSocketAddress(info.groupOwnerAddress.getHostName(), 8000), 1000);
+                    }
+                    Message msg = handler.obtainMessage(SOCKET_CREATED, socket);
+                    msg.setTarget(handler);
+                    msg.sendToTarget();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        };
         session.start();
     }
 
     private void startSharing(Socket socket) {
-        sendReciveFile = new SendReciveFile(socket, handler);
-        sendReciveFile.start();
-        if (selectedFileList != null) {
-            for (int i = 0; i < selectedFileList.size(); i++) {
-                drawSend(selectedFileList.get(i));
-            }
-            sendNext();
+        InputStream inputStream=null;
+        OutputStream outputStream=null;
+        DataInputStream dis=null;
+        DataOutputStream dos = null;
+        String parentFolder;
+        if(Build.VERSION.SDK_INT>=Build.VERSION_CODES.Q){
+            parentFolder="/";
+        }else{
+            parentFolder=Environment.getExternalStorageDirectory().getAbsolutePath() + "/fileSharing/";
         }
+
+
+        try{
+            inputStream = socket.getInputStream();
+            outputStream = socket.getOutputStream();
+            dos = new DataOutputStream(outputStream);
+            dis = new DataInputStream(inputStream);
+        }
+        catch(Exception e){
+            e.printStackTrace();
+        }
+
+        DataInputStream finalDis = dis;
+        InputStream finalInputStream = inputStream;
+        Thread receive=new Thread(){
+            @Override
+            public void run() {
+                int bytes;
+                byte[] data = new byte[BUFFER_SIZE];
+                while (socket != null) {
+                    try {
+                        if(!finalDis.readBoolean()){
+                            continue;
+                        }
+                        long fileSize = finalDis.readLong();
+                        String fileName = finalDis.readUTF();
+                        FileR fileR = new FileR(fileName, fileSize);
+                        Message msg = handler.obtainMessage(FILE_RECEIVING, fileR);
+                        msg.setTarget(handler);
+                        msg.sendToTarget();
+                        File file = new File(parentFolder + fileName);
+                        FileOutputStream fos = new FileOutputStream(file);
+                        while ((bytes = finalInputStream.read(data, 0, (int) (Math.min(fileSize, BUFFER_SIZE)))) > 0) {
+                            fileSize -= bytes;
+                            fos.write(data, 0, bytes);
+                            handler.obtainMessage(DATA_PART_RECEIVED).sendToTarget();
+                        }
+                        fos.close();
+                        //dos.writeBoolean(true);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        };
+
+        DataOutputStream finalDos = dos;
+        OutputStream finalOutputStream = outputStream;
+        Thread send=new Thread(){
+            @Override
+            public void run() {
+                File file;
+                while(socket!=null) {
+                    try {
+                        if(selectedFileList==null || curSend>=selectedFileList.size()){
+                            finalDos.writeBoolean(false);
+                            continue;
+                        }
+                        file=new File(selectedFileList.get(curSend));
+                        if(!file.exists()){
+                            finalDos.writeBoolean(false);
+                            curSend++;
+                            continue;
+                        }
+                        finalDos.writeBoolean(true);
+                        long fileSize = file.length();
+                        String fileName = file.getName();
+                        finalDos.writeLong(fileSize);
+                        finalDos.writeUTF(fileName);
+                        FileInputStream fis = new FileInputStream(file);
+                        byte[] data = new byte[BUFFER_SIZE];
+
+                        while (fis.read(data) > 0) {
+                            finalOutputStream.write(data);
+                            Message msg = handler.obtainMessage(DATA_PART_SENT);
+                            msg.setTarget(handler);
+                            msg.sendToTarget();
+                        }
+                        fis.close();
+                        Message msgS = handler.obtainMessage(FILE_SENT);
+                        msgS.setTarget(handler);
+                        msgS.sendToTarget();
+                        curSend++;
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        };
+
+        receive.start();
+        send.start();
     }
 
     public void drawSend(String url) {
@@ -165,20 +299,23 @@ public class Sharing extends AppCompatActivity {
         }
     }
 
-    private void sendNext() {
-        if (curSend >= selectedFileList.size()) {
-            return;
-        }
-        File curFile = new File(selectedFileList.get(curSend));
-        sendReciveFile.send(curFile);
-    }
+//    private void sendNext() {
+//        if (curSend >= selectedFileList.size()) {
+//            return;
+//        }
+//        File curFile = new File(selectedFileList.get(curSend));
+//        sendReciveFile.send(curFile);
+//    }
 
     private void makeProgress(boolean isSend) {
+        if(curSend>=selectedFileList.size()){
+            return;
+        }
         int progress;
         View fileSharingView;
         fileSharingView = isSend ? sendViewList.get(curSend) : curReceiveView;
         ProgressBar progressBar = (ProgressBar) fileSharingView.findViewById(R.id.pbrSent);
-        progress = Math.min(progressBar.getProgress() + SendReciveFile.BUFFER_SIZE, progressBar.getMax());
+        progress = Math.min(progressBar.getProgress() + BUFFER_SIZE, progressBar.getMax());
         progressBar.setProgress(progress);
         TextView sentView = fileSharingView.findViewById(R.id.tvSent);
         sentView.setText(getSize(progress));

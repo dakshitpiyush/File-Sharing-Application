@@ -129,7 +129,9 @@ public class Sharing extends AppCompatActivity {
                 Socket socket = null;
                 try {
                     if (info.groupFormed && info.isGroupOwner) {
-                        ServerSocket sc = new ServerSocket(8000);
+                        ServerSocket sc = new ServerSocket();
+                        sc.setReuseAddress(true);
+                        sc.bind(new InetSocketAddress(8069));
                         socket = sc.accept();
                     } else {
                         socket = new Socket();

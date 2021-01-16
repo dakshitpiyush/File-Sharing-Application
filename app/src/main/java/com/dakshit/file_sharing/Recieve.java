@@ -91,7 +91,7 @@ public class Recieve extends AppCompatActivity {
 
             @Override
             public void onFailure(int reason) {
-                message.setText("searching fails, Retry");
+                message.setText("searching fails, Retry error code"+ String.valueOf(reason));
             }
         });
 

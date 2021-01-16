@@ -1,18 +1,22 @@
 package com.dakshit.file_sharing;
 
+import android.content.Context;
 import android.content.Intent;
 import android.net.wifi.p2p.WifiP2pInfo;
+import android.net.wifi.p2p.WifiP2pManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -66,6 +70,8 @@ public class Sharing extends AppCompatActivity {
     private ArrayList<View> sendViewList = new ArrayList<>();
     private View curReceiveView;
     public final int BUFFER_SIZE=4096;
+    private WifiP2pManager wifiP2pManager;
+    private WifiP2pManager.Channel channel;
 
     public static final int SOCKET_CREATED=1;
     public static final int FILE_RECEIVING=2;
@@ -83,6 +89,9 @@ public class Sharing extends AppCompatActivity {
         info = (WifiP2pInfo) parent.getParcelableExtra("wifiP2pInfo");
         if (parent.hasExtra("selectedFileList"))
             selectedFileList = parent.getStringArrayListExtra("selectedFileList");
+
+        wifiP2pManager = (WifiP2pManager) getSystemService(Context.WIFI_P2P_SERVICE);
+        channel = wifiP2pManager.initialize(this, getMainLooper(), null);
         handler = new Handler(new Handler.Callback() {
             @Override
             public boolean handleMessage(@NonNull Message msg) {
@@ -138,7 +147,7 @@ public class Sharing extends AppCompatActivity {
         session.start();
     }
 
-    private void startSharing(Socket socket) {
+    private void startSharing(final Socket socket) {
         InputStream inputStream=null;
         OutputStream outputStream=null;
         DataInputStream dis=null;
@@ -166,13 +175,11 @@ public class Sharing extends AppCompatActivity {
         Thread receive=new Thread(){
             @Override
             public void run() {
+
                 int bytes;
                 byte[] data = new byte[BUFFER_SIZE];
-                while (socket != null) {
+                while (socket!=null && !socket.isClosed()) {
                     try {
-                        if(!finalDis.readBoolean()){
-                            continue;
-                        }
                         long fileSize = finalDis.readLong();
                         String fileName = finalDis.readUTF();
                         FileR fileR = new FileR(fileName, fileSize);
@@ -181,13 +188,12 @@ public class Sharing extends AppCompatActivity {
                         msg.sendToTarget();
                         File file = new File(parentFolder + fileName);
                         FileOutputStream fos = new FileOutputStream(file);
-                        while ((bytes = finalInputStream.read(data, 0, (int) (Math.min(fileSize, BUFFER_SIZE)))) > 0) {
+                        while ((bytes = finalInputStream.read(data, 0, BUFFER_SIZE)) > 0 && fileSize>0) {
                             fileSize -= bytes;
                             fos.write(data, 0, bytes);
                             handler.obtainMessage(DATA_PART_RECEIVED).sendToTarget();
                         }
                         fos.close();
-                        //dos.writeBoolean(true);
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
@@ -201,19 +207,16 @@ public class Sharing extends AppCompatActivity {
             @Override
             public void run() {
                 File file;
-                while(socket!=null) {
+                while(socket!=null && !socket.isClosed()) {
                     try {
                         if(selectedFileList==null || curSend>=selectedFileList.size()){
-                            finalDos.writeBoolean(false);
-                            continue;
+                            break;
                         }
                         file=new File(selectedFileList.get(curSend));
                         if(!file.exists()){
-                            finalDos.writeBoolean(false);
                             curSend++;
                             continue;
                         }
-                        finalDos.writeBoolean(true);
                         long fileSize = file.length();
                         String fileName = file.getName();
                         finalDos.writeLong(fileSize);
@@ -222,7 +225,7 @@ public class Sharing extends AppCompatActivity {
                         byte[] data = new byte[BUFFER_SIZE];
 
                         while (fis.read(data) > 0) {
-                            finalOutputStream.write(data);
+                            finalOutputStream.write(data, 0, BUFFER_SIZE);
                             Message msg = handler.obtainMessage(DATA_PART_SENT);
                             msg.setTarget(handler);
                             msg.sendToTarget();
@@ -233,7 +236,7 @@ public class Sharing extends AppCompatActivity {
                         msgS.sendToTarget();
                         curSend++;
                     } catch (IOException e) {
-                        e.printStackTrace();
+
                     }
                 }
             }
@@ -256,7 +259,12 @@ public class Sharing extends AppCompatActivity {
         } else {
             int pos = fileName.lastIndexOf(".");
             if (pos != -1) {
-                icon.setImageResource(icons.getOrDefault(fileName.substring(pos + 1), R.drawable.unknown));
+                if(icons.containsKey(fileName.substring(pos + 1))){
+                    icon.setImageResource(icons.get(fileName.substring(pos +1)));
+                }
+                else{
+                    icon.setImageResource(R.drawable.unknown);
+                }
             } else {
                 icon.setImageResource(R.drawable.unknown);
             }
@@ -276,7 +284,12 @@ public class Sharing extends AppCompatActivity {
         ProgressBar progressBar = fileShareView.findViewById(R.id.pbrSent);
         int pos = fileName.lastIndexOf(".");
         if (pos != -1) {
-            icon.setImageResource(icons.getOrDefault(fileName.substring(pos + 1), R.drawable.unknown));
+            if(icons.containsKey(fileName.substring(pos + 1))){
+                icon.setImageResource(icons.get(fileName.substring(pos +1)));
+            }
+            else{
+                icon.setImageResource(R.drawable.unknown);
+            }
         } else {
             icon.setImageResource(R.drawable.unknown);
         }
@@ -308,7 +321,7 @@ public class Sharing extends AppCompatActivity {
 //    }
 
     private void makeProgress(boolean isSend) {
-        if(curSend>=selectedFileList.size()){
+        if(selectedFileList!=null && curSend>=selectedFileList.size()){
             return;
         }
         int progress;
@@ -321,6 +334,21 @@ public class Sharing extends AppCompatActivity {
         sentView.setText(getSize(progress));
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        wifiP2pManager.removeGroup(channel, new WifiP2pManager.ActionListener() {
+            @Override
+            public void onSuccess() {
+                Toast.makeText(getApplicationContext(), "group removed", Toast.LENGTH_LONG).show();
+            }
+
+            @Override
+            public void onFailure(int reason) {
+                Toast.makeText(getApplicationContext(), "Not removed", Toast.LENGTH_LONG).show();
+            }
+        });
+    }
 
 }
 

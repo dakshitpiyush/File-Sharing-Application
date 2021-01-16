@@ -86,7 +86,7 @@ public class Connect extends AppCompatActivity {
 
             @Override
             public void onFailure(int reason) {
-                message.setText("searching fails, Retry");
+                message.setText("searching fails, Retry error code"+ String.valueOf(reason));
             }
         });
         peerList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -174,7 +174,13 @@ public class Connect extends AppCompatActivity {
     @Override
     protected void onPause() {
         super.onPause();
-        registerReceiver(broadcastReceiver, intentFilter);
+        unregisterReceiver(broadcastReceiver);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        unregisterReceiver(broadcastReceiver);
     }
 
     private static class WifiDirectBroadcastReceiver extends BroadcastReceiver {

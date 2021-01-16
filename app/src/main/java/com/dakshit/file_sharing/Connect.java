@@ -177,11 +177,6 @@ public class Connect extends AppCompatActivity {
         unregisterReceiver(broadcastReceiver);
     }
 
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        unregisterReceiver(broadcastReceiver);
-    }
 
     private static class WifiDirectBroadcastReceiver extends BroadcastReceiver {
         private WifiP2pManager wifiP2pManager;

@@ -188,7 +188,7 @@ public class Sharing extends AppCompatActivity {
                         msg.sendToTarget();
                         File file = new File(parentFolder + fileName);
                         FileOutputStream fos = new FileOutputStream(file);
-                        while ((bytes = finalInputStream.read(data, 0, BUFFER_SIZE)) > 0 && fileSize>0) {
+                        while ((bytes = finalInputStream.read(data, 0, (int)Math.min(BUFFER_SIZE, fileSize))) !=-1 && fileSize>0) {
                             fileSize -= bytes;
                             fos.write(data, 0, bytes);
                             handler.obtainMessage(DATA_PART_RECEIVED).sendToTarget();
@@ -224,8 +224,9 @@ public class Sharing extends AppCompatActivity {
                         FileInputStream fis = new FileInputStream(file);
                         byte[] data = new byte[BUFFER_SIZE];
 
-                        while (fis.read(data) > 0) {
-                            finalOutputStream.write(data, 0, BUFFER_SIZE);
+                        while (fis.read(data) != -1) {
+                            finalOutputStream.write(data, 0, (int)Math.min(fileSize, data.length));
+                            fileSize-=BUFFER_SIZE;
                             Message msg = handler.obtainMessage(DATA_PART_SENT);
                             msg.setTarget(handler);
                             msg.sendToTarget();
@@ -236,7 +237,7 @@ public class Sharing extends AppCompatActivity {
                         msgS.sendToTarget();
                         curSend++;
                     } catch (IOException e) {
-
+                            e.printStackTrace();
                     }
                 }
             }

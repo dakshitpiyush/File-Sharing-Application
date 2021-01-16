@@ -136,7 +136,7 @@ public class Sharing extends AppCompatActivity {
                     } else {
                         socket = new Socket();
                         //todo:decide best statergy to avoid port already used situation
-                        socket.connect(new InetSocketAddress(info.groupOwnerAddress.getHostName(), 8000), 1000);
+                        socket.connect(new InetSocketAddress(info.groupOwnerAddress.getHostName(), 8069), 1000);
                     }
                     Message msg = handler.obtainMessage(SOCKET_CREATED, socket);
                     msg.setTarget(handler);
@@ -156,7 +156,8 @@ public class Sharing extends AppCompatActivity {
         DataOutputStream dos = null;
         String parentFolder;
         if(Build.VERSION.SDK_INT>=Build.VERSION_CODES.Q){
-            parentFolder="/";
+//            parentFolder="/";
+            parentFolder = getApplicationContext().getExternalFilesDir(null).getPath();
         }else{
             parentFolder=Environment.getExternalStorageDirectory().getAbsolutePath() + "/fileSharing/";
         }

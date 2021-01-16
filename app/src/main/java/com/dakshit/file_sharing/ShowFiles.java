@@ -2,9 +2,7 @@ package com.dakshit.file_sharing;
 
 import android.app.Activity;
 import android.app.ListActivity;
-import android.content.Context;
 import android.content.Intent;
-import android.net.wifi.p2p.WifiP2pManager;
 import android.os.Bundle;
 import android.os.Environment;
 import android.view.LayoutInflater;
@@ -16,7 +14,6 @@ import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -32,7 +29,6 @@ public class ShowFiles extends ListActivity {
     private HashSet<String> selectedFilesSet = new HashSet<>();
     private TextView fileCountView;
     private ArrayList<String> filenames = new ArrayList<>();
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -41,8 +37,6 @@ public class ShowFiles extends ListActivity {
         fileCountView = findViewById(R.id.noSelectedFile);
         root = new File(Environment.getExternalStorageDirectory().getAbsolutePath());
         directoryPath=findViewById(R.id.dirName);
-
-
 
         curDirectory = root;
         directoryPath.setText(curDirectory.getPath());
@@ -110,8 +104,6 @@ public class ShowFiles extends ListActivity {
 
     }
 
-
-
     private class MyListAdapter extends ArrayAdapter<String> {
 
         private final Activity context;
@@ -166,12 +158,7 @@ public class ShowFiles extends ListActivity {
                 int pos = maintitle.get(position).getName().lastIndexOf(".");
                 String filecha = maintitle.get(position).getName();
                 if (pos != -1) {
-                    if(icons.containsKey(maintitle.get(position).getName().substring(pos + 1))){
-                        imageView.setImageResource(icons.get(maintitle.get(position).getName().substring(pos +1)));
-                    }
-                    else{
-                        imageView.setImageResource(R.drawable.unknown);
-                    }
+                    imageView.setImageResource(icons.getOrDefault(maintitle.get(position).getName().substring(pos + 1), R.drawable.unknown));
                 } else {
                     imageView.setImageResource(R.drawable.unknown);
                 }

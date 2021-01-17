@@ -24,6 +24,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
+import java.io.EOFException;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -115,6 +116,12 @@ public class Sharing extends AppCompatActivity {
                     case DATA_PART_SENT:
                         makeProgress(true);
                         break;
+                    case 6:
+                        Toast.makeText(getApplicationContext(), "tuza sender palala", Toast.LENGTH_LONG).show();
+                        Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                        startActivity(intent);
+                        break;
                 }
                 return true;
             }
@@ -199,8 +206,12 @@ public class Sharing extends AppCompatActivity {
                             handler.obtainMessage(DATA_PART_RECEIVED).sendToTarget();
                         }
                         fos.close();
-                    } catch (IOException e) {
+                    }catch (EOFException e){
+                        handler.obtainMessage(6).sendToTarget();
+                    }
+                    catch (IOException e) {
                         e.printStackTrace();
+
                     }
                 }
             }
@@ -324,6 +335,13 @@ public class Sharing extends AppCompatActivity {
         }
     }
 
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+    }
+
+
+
     private void makeProgress(boolean isSend) {
         if(selectedFileList!=null && curSend>=selectedFileList.size()){
             return;
@@ -347,6 +365,16 @@ public class Sharing extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        try {
+            if (socket !=  null){
+                socket.close();
+            }
+            if(sc != null){
+                sc.close();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         wifiP2pManager.removeGroup(channel, new WifiP2pManager.ActionListener() {
             @Override
             public void onSuccess() {

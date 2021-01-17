@@ -14,6 +14,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -61,9 +62,9 @@ public class Sharing extends AppCompatActivity {
         put("tar", R.drawable.zip);
         put("rar", R.drawable.zip);
     }};
-    private ViewGroup scroll;
+    private LinearLayout scroll;
     private WifiP2pInfo info;
-    private ArrayList<String> selectedFileList = null;
+    private ArrayList<String> selectedFileList = new ArrayList<>();
     private Handler handler;
     private LayoutInflater layoutInflater;
     private int curSend = 0;
@@ -72,6 +73,8 @@ public class Sharing extends AppCompatActivity {
     public final int BUFFER_SIZE=4096;
     private WifiP2pManager wifiP2pManager;
     private WifiP2pManager.Channel channel;
+    private Socket socket;
+    private ServerSocket sc=null;
 
     public static final int SOCKET_CREATED=1;
     public static final int FILE_RECEIVING=2;
@@ -97,8 +100,7 @@ public class Sharing extends AppCompatActivity {
             public boolean handleMessage(@NonNull Message msg) {
                 switch (msg.what) {
                     case SOCKET_CREATED:
-                        Socket socket = (Socket) msg.obj;
-                        startSharing(socket);
+                        startSharing();
                         break;
                     case FILE_RECEIVING:
                         FileR fileR = (FileR) msg.obj;
@@ -126,10 +128,9 @@ public class Sharing extends AppCompatActivity {
         Thread session=new Thread(){
             @Override
             public void run() {
-                Socket socket = null;
                 try {
                     if (info.groupFormed && info.isGroupOwner) {
-                        ServerSocket sc = new ServerSocket();
+                        sc = new ServerSocket();
                         sc.setReuseAddress(true);
                         sc.bind(new InetSocketAddress(8069));
                         socket = sc.accept();
@@ -147,9 +148,10 @@ public class Sharing extends AppCompatActivity {
             }
         };
         session.start();
+        Log.v("starting", "sharing activty created");
     }
 
-    private void startSharing(final Socket socket) {
+    private void startSharing() {
         InputStream inputStream=null;
         OutputStream outputStream=null;
         DataInputStream dis=null;
@@ -249,6 +251,11 @@ public class Sharing extends AppCompatActivity {
         receive.start();
         send.start();
     }
+    public void addFile(View view){
+        Log.v("btn presse","file add call");
+        //Todo: code for adding file
+
+    }
 
     public void drawSend(String url) {
         File curFile = new File(url);
@@ -278,6 +285,7 @@ public class Sharing extends AppCompatActivity {
         fileSizeView.setText(getSize((double) curFile.length()));
         scroll.addView(fileShareView);
         sendViewList.add(fileShareView);
+
     }
 
     private void receive(String fileName, long size) {
@@ -316,14 +324,6 @@ public class Sharing extends AppCompatActivity {
         }
     }
 
-//    private void sendNext() {
-//        if (curSend >= selectedFileList.size()) {
-//            return;
-//        }
-//        File curFile = new File(selectedFileList.get(curSend));
-//        sendReciveFile.send(curFile);
-//    }
-
     private void makeProgress(boolean isSend) {
         if(selectedFileList!=null && curSend>=selectedFileList.size()){
             return;
@@ -339,6 +339,12 @@ public class Sharing extends AppCompatActivity {
     }
 
     @Override
+    protected void onRestart() {
+        super.onRestart();
+        Log.v("restarting", "restarting sharing activity but whayii");
+    }
+
+    @Override
     protected void onDestroy() {
         super.onDestroy();
         wifiP2pManager.removeGroup(channel, new WifiP2pManager.ActionListener() {
@@ -349,11 +355,34 @@ public class Sharing extends AppCompatActivity {
 
             @Override
             public void onFailure(int reason) {
-                Toast.makeText(getApplicationContext(), "Not removed", Toast.LENGTH_LONG).show();
+                Toast.makeText(getApplicationContext(), "Not removed error code"+ String.valueOf(reason), Toast.LENGTH_LONG).show();
             }
         });
     }
 
+    @Override
+    protected void onStop() {
+        super.onStop();
+        Log.v("sharing", "activity is stoping");
+//        try {
+//            if (socket != null) socket.close();
+//            if (sc != null) sc.close();
+//        }catch(IOException e){
+//
+//        }
+//        wifiP2pManager.removeGroup(channel, new WifiP2pManager.ActionListener() {
+//            @Override
+//            public void onSuccess() {
+//                Toast.makeText(getApplicationContext(), "group removed", Toast.LENGTH_LONG).show();
+//            }
+//
+//            @Override
+//            public void onFailure(int reason) {
+//                Toast.makeText(getApplicationContext(), "Not removed error code"+ String.valueOf(reason) , Toast.LENGTH_LONG).show();
+//            }
+//        });
+
+    }
 }
 
 class FileR {

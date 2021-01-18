@@ -347,6 +347,10 @@ public class Sharing extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        try{
+            if(sc!=null) sc.close();
+            if(socket!=null) socket.close();
+        }catch (IOException e){}
         wifiP2pManager.removeGroup(channel, new WifiP2pManager.ActionListener() {
             @Override
             public void onSuccess() {

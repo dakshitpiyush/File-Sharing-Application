@@ -96,6 +96,32 @@ public class Sharing extends AppCompatActivity {
 
         wifiP2pManager = (WifiP2pManager) getSystemService(Context.WIFI_P2P_SERVICE);
         channel = wifiP2pManager.initialize(this, getMainLooper(), null);
+        Thread session=new Thread(){
+            @Override
+            public void run() {
+                try {
+                    if (info.groupFormed && info.isGroupOwner) {
+                        Log.v("sc","server created");
+                        sc = new ServerSocket();
+                        sc.setReuseAddress(true);
+                        sc.bind(new InetSocketAddress(8069));
+                        socket = sc.accept();
+
+                    } else {
+                        socket = new Socket();
+                        Log.v("sc","client created");
+                        //todo:decide best statergy to avoid port already used situation
+                        socket.connect(new InetSocketAddress(info.groupOwnerAddress.getHostName(), 8069), 1000);
+
+                    }
+                    Message msg = handler.obtainMessage(SOCKET_CREATED, socket);
+                    msg.setTarget(handler);
+                    msg.sendToTarget();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        };
         handler = new Handler(new Handler.Callback() {
             @Override
             public boolean handleMessage(@NonNull Message msg) {
@@ -117,10 +143,9 @@ public class Sharing extends AppCompatActivity {
                         makeProgress(true);
                         break;
                     case 6:
-                        Toast.makeText(getApplicationContext(), "tuza sender palala", Toast.LENGTH_LONG).show();
-                        Intent intent = new Intent(getApplicationContext(), MainActivity.class);
-                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                        startActivity(intent);
+//                        Toast.makeText(getApplicationContext(), "tuza sender palala", Toast.LENGTH_LONG).show();
+//                        Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+//                        navigateUpTo(intent);
                         break;
                 }
                 return true;
@@ -132,28 +157,7 @@ public class Sharing extends AppCompatActivity {
             drawSend(selectedFileList.get(i));
         }
 
-        Thread session=new Thread(){
-            @Override
-            public void run() {
-                try {
-                    if (info.groupFormed && info.isGroupOwner) {
-                        sc = new ServerSocket();
-                        sc.setReuseAddress(true);
-                        sc.bind(new InetSocketAddress(8069));
-                        socket = sc.accept();
-                    } else {
-                        socket = new Socket();
-                        //todo:decide best statergy to avoid port already used situation
-                        socket.connect(new InetSocketAddress(info.groupOwnerAddress.getHostName(), 8069), 1000);
-                    }
-                    Message msg = handler.obtainMessage(SOCKET_CREATED, socket);
-                    msg.setTarget(handler);
-                    msg.sendToTarget();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        };
+
         session.start();
         Log.v("starting", "sharing activty created");
     }
@@ -385,6 +389,7 @@ public class Sharing extends AppCompatActivity {
                 Toast.makeText(getApplicationContext(), "Not removed error code"+ String.valueOf(reason), Toast.LENGTH_LONG).show();
             }
         });
+        Log.v("destroy", "activity destroye");
     }
 
     @Override

@@ -8,6 +8,7 @@ import android.net.wifi.WifiConfiguration;
 import android.net.wifi.WifiManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 
@@ -33,6 +34,7 @@ public class MainActivity extends AppCompatActivity {
         requestPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE);
         requestPermission(Manifest.permission.ACCESS_FINE_LOCATION);
         requestPermission(Manifest.permission.CHANGE_WIFI_STATE);
+        Log.v("start", "Activity is start");
     }
 
     public void sendReceiveFile(View view) {
@@ -94,4 +96,9 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    @Override
+    protected void onStop() {
+        super.onStop();
+        Log.v("stop", "Activity is stoping");
+    }
 }

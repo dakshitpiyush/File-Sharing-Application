@@ -13,7 +13,8 @@
         android:layout_height="548dp"
         android:layout_marginBottom="76dp"
         app:layout_constraintBottom_toBottomOf="parent"
-        tools:layout_editor_absoluteX="0dp">
+        tools:layout_editor_absoluteX="0dp"
+        tools:ignore="MissingConstraints">
 
         <LinearLayout
             android:id="@+id/scrShare"
@@ -30,6 +31,7 @@
         android:id="@+id/btnAddSend"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:onClick="addFile"
         android:text="Add file"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"

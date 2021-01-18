@@ -16,6 +16,7 @@ import android.net.wifi.p2p.WifiP2pInfo;
 import android.net.wifi.p2p.WifiP2pManager;
 import android.os.Bundle;
 import android.os.Message;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -233,7 +234,11 @@ public class Connect extends AppCompatActivity {
             }
         }
     }
-
+    @Override
+    protected void onStop() {
+        super.onStop();
+        Log.v("stop", "Activity is stoping");
+    }
 
 }
 

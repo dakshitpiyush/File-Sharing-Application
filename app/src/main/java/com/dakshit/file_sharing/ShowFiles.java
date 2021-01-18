@@ -5,6 +5,7 @@ import android.app.ListActivity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Environment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -198,6 +199,11 @@ public class ShowFiles extends ListActivity {
                 return String.format("%.1f", length / (1024 * 1024 * 1024)) + " GB";
             }
         }
+    }
+    @Override
+    protected void onStop() {
+        super.onStop();
+        Log.v("stop", "Activity is stoping");
     }
 
 }

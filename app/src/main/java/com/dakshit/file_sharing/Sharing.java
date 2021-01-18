@@ -111,7 +111,7 @@ public class Sharing extends AppCompatActivity {
                         socket = new Socket();
                         Log.v("sc","client created");
                         //todo:decide best statergy to avoid port already used situation
-                        socket.connect(new InetSocketAddress(info.groupOwnerAddress.getHostName(), 8069), 1000);
+                         socket.connect(new InetSocketAddress(info.groupOwnerAddress.getHostName(), 8069), 1000);
 
                     }
                     Message msg = handler.obtainMessage(SOCKET_CREATED, socket);
@@ -172,7 +172,12 @@ public class Sharing extends AppCompatActivity {
 //            parentFolder="/";
             parentFolder = getApplicationContext().getExternalFilesDir(null).getPath();
         }else{
-            parentFolder=Environment.getExternalStorageDirectory().getAbsolutePath() + "/fileSharing/";
+            parentFolder=Environment.getExternalStorageDirectory().getAbsolutePath() + "/fileSharing";
+            File file = new File(parentFolder);
+            if(!file.exists()){
+                file.mkdir();
+            }
+            parentFolder += "/";
         }
 
 
@@ -188,6 +193,7 @@ public class Sharing extends AppCompatActivity {
 
         DataInputStream finalDis = dis;
         InputStream finalInputStream = inputStream;
+        String finalParentFolder = parentFolder;
         Thread receive=new Thread(){
             @Override
             public void run() {
@@ -202,7 +208,7 @@ public class Sharing extends AppCompatActivity {
                         Message msg = handler.obtainMessage(FILE_RECEIVING, fileR);
                         msg.setTarget(handler);
                         msg.sendToTarget();
-                        File file = new File(parentFolder + fileName);
+                        File file = new File(finalParentFolder + fileName);
                         FileOutputStream fos = new FileOutputStream(file);
                         while ((bytes = finalInputStream.read(data, 0, (int)Math.min(BUFFER_SIZE, fileSize))) !=-1 && fileSize>0) {
                             fileSize -= bytes;
@@ -415,6 +421,15 @@ public class Sharing extends AppCompatActivity {
 //        });
 
     }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        Log.v("sharing", "actvity resumed");
+    }
+
+
+
 }
 
 class FileR {

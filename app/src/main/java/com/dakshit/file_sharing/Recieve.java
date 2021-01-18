@@ -116,7 +116,7 @@ public class Recieve extends AppCompatActivity {
     @Override
     protected void onPause() {
         super.onPause();
-        registerReceiver(wifiBroadcastReciever, intentFilter);
+        unregisterReceiver(wifiBroadcastReciever);
     }
 
     WifiP2pManager.ConnectionInfoListener connectionInfoListener = new WifiP2pManager.ConnectionInfoListener() {

@@ -102,7 +102,6 @@ public class ShowFiles extends ListActivity {
         ArrayList arr = new ArrayList(selectedFilesSet);
         connect.putExtra("fileList", arr);
         startActivity(connect);
-
     }
 
     private class MyListAdapter extends ArrayAdapter<String> {

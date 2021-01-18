@@ -98,10 +98,12 @@ public class ShowFiles extends ListActivity {
     }
 
     public void connect(View view) {
-        Intent connect = new Intent(this, Connect.class);
         ArrayList arr = new ArrayList(selectedFilesSet);
-        connect.putExtra("fileList", arr);
-        startActivity(connect);
+        Intent intent=new Intent();
+        intent.putExtra("fileList", arr);
+        setResult(Activity.RESULT_OK, intent);
+        Log.v("runnin","running");
+        finish();
     }
 
     private class MyListAdapter extends ArrayAdapter<String> {

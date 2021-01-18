@@ -2,6 +2,7 @@ package com.dakshit.file_sharing;
 
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.net.wifi.p2p.WifiP2pInfo;
 import android.net.wifi.p2p.WifiP2pManager;
 import android.os.Build;
@@ -20,6 +21,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import java.io.DataInputStream;
@@ -111,7 +113,7 @@ public class Sharing extends AppCompatActivity {
                         socket = new Socket();
                         Log.v("sc","client created");
                         //todo:decide best statergy to avoid port already used situation
-                        socket.connect(new InetSocketAddress(info.groupOwnerAddress.getHostName(), 8069), 1000);
+                        socket.connect(new InetSocketAddress(info.groupOwnerAddress.getHostName(), 8069), 5000);
 
                     }
                     Message msg = handler.obtainMessage(SOCKET_CREATED, socket);
@@ -173,6 +175,7 @@ public class Sharing extends AppCompatActivity {
             parentFolder = getApplicationContext().getExternalFilesDir(null).getPath();
         }else{
             parentFolder=Environment.getExternalStorageDirectory().getAbsolutePath() + "/fileSharing/";
+
         }
 
 
@@ -229,7 +232,7 @@ public class Sharing extends AppCompatActivity {
                 while(socket!=null && !socket.isClosed()) {
                     try {
                         if(selectedFileList==null || curSend>=selectedFileList.size()){
-                            break;
+                            continue;
                         }
                         file=new File(selectedFileList.get(curSend));
                         if(!file.exists()){
@@ -267,7 +270,52 @@ public class Sharing extends AppCompatActivity {
     }
     public void addFile(View view){
         Log.v("btn presse","file add call");
-        //Todo: code for adding file
+        Intent selectFileIntent;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+
+            selectFileIntent = new Intent(Intent.ACTION_GET_CONTENT);
+            selectFileIntent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
+            selectFileIntent.addCategory(Intent.CATEGORY_OPENABLE);
+            selectFileIntent.setType("*/*");  //use image/* for photos, etc.
+            startActivityForResult(selectFileIntent, 1001);
+
+        } else {
+            selectFileIntent = new Intent(this, ShowFiles.class);
+            startActivityForResult(selectFileIntent, 1002);
+        }
+
+    }
+
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (resultCode == RESULT_OK && requestCode == 1001 && data != null) {
+            ArrayList<String> selectedFileList2 = new ArrayList<>();
+            if (data.getClipData() != null) {
+                // Getting the length of data and logging up the logs using index
+                for (int index = 0; index < data.getClipData().getItemCount(); index++) {
+                    // Getting the URIs of the selected files and logging them into logcat at debug level
+                    Uri uri = data.getClipData().getItemAt(index).getUri();
+                    selectedFileList2.add(FileUtils.getPath(getApplicationContext(), uri));
+                }
+            } else {
+                // Getting the URI of the selected file and logging into logcat at debug level
+                Uri uri = data.getData();
+                selectedFileList2.add(FileUtils.getPath(getApplicationContext(), uri));
+            }
+            selectedFileList.addAll(selectedFileList2);
+            if(selectedFileList2!=null)
+                for(int i=0; i<selectedFileList2.size();i++){
+                    drawSend(selectedFileList2.get(i));
+                }
+        }
+        if (resultCode == RESULT_OK && requestCode == 1002 && data != null) {
+            ArrayList<String> selectedFileList2=data.getStringArrayListExtra("fileList");
+            selectedFileList.addAll(selectedFileList2);
+            if(selectedFileList2!=null)
+                for(int i=0; i<selectedFileList2.size();i++){
+                    drawSend(selectedFileList2.get(i));
+                }
+        }
 
     }
 

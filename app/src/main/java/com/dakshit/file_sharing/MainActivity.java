@@ -51,7 +51,7 @@ public class MainActivity extends AppCompatActivity {
 
                 } else {
                     selectFileIntent = new Intent(this, ShowFiles.class);
-                    startActivity(selectFileIntent);
+                    startActivityForResult(selectFileIntent, 1002);
                 }
             } else if (view.getId() == R.id.btnRecive) {
                 Intent receiveFileIntent = new Intent(this, Recieve.class);
@@ -75,7 +75,6 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
         if (resultCode == RESULT_OK && requestCode == 1001 && data != null) {
             ArrayList<String> selectedFileList = new ArrayList<>();
             if (data.getClipData() != null) {
@@ -90,6 +89,12 @@ public class MainActivity extends AppCompatActivity {
                 Uri uri = data.getData();
                 selectedFileList.add(FileUtils.getPath(getApplicationContext(), uri));
             }
+            Intent connect = new Intent(this, Connect.class);
+            connect.putExtra("fileList", selectedFileList);
+            startActivity(connect);
+        }
+        if (resultCode == RESULT_OK && requestCode == 1002 && data != null) {
+            ArrayList<String> selectedFileList=data.getStringArrayListExtra("fileList");
             Intent connect = new Intent(this, Connect.class);
             connect.putExtra("fileList", selectedFileList);
             startActivity(connect);

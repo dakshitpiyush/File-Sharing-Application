@@ -158,7 +158,12 @@ public class ShowFiles extends ListActivity {
                 int pos = maintitle.get(position).getName().lastIndexOf(".");
                 String filecha = maintitle.get(position).getName();
                 if (pos != -1) {
-                    imageView.setImageResource(icons.getOrDefault(maintitle.get(position).getName().substring(pos + 1), R.drawable.unknown));
+                    if(icons.containsKey(maintitle.get(position).getName().substring(pos + 1))){
+                        imageView.setImageResource(icons.get(maintitle.get(position).getName().substring(pos + 1)));
+                    }
+                    else{
+                        imageView.setImageResource(R.drawable.unknown);
+                    }
                 } else {
                     imageView.setImageResource(R.drawable.unknown);
                 }

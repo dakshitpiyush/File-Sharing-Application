@@ -1,121 +1,138 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".Sharing">
+    tools:context=".Sharing" >
 
     <ScrollView
 
         android:id="@+id/scrollView2"
-        android:layout_width="415dp"
-        android:layout_height="548dp"
-        app:layout_constraintTop_toTopOf="parent"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/btnAddSend"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="5dp"
+        android:layout_marginBottom="5dp"
+        android:minHeight="600sp"
+        android:padding="10dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toTopOf="@id/btnAddSend"
+        app:layout_constraintVertical_bias="0.138"
         tools:ignore="MissingConstraints"
-        tools:layout_editor_absoluteX="0dp">
+        tools:layout_editor_absoluteX="-2dp">
 
         <LinearLayout
             android:id="@+id/scrShare"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:padding="2sp">
 
-            <com.google.android.material.card.MaterialCardView
-                android:id="@+id/shareView"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="right"
-                android:layout_marginStart="3dp"
-                android:layout_marginTop="5dp"
-                android:layout_marginBottom="5dp"
-                android:padding="1dp"
-                app:cardCornerRadius="8dp"
-                app:cardElevation="8dp"
-                app:strokeColor="#f00"
-                app:strokeWidth="2dp">
+<!--            <com.google.android.material.card.MaterialCardView-->
+<!--                android:id="@+id/shareView"-->
+<!--                android:layout_width="wrap_content"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:layout_marginStart="3dp"-->
+<!--                android:layout_marginTop="5dp"-->
+<!--                android:layout_marginBottom="5dp"-->
+<!--                android:padding="1dp"-->
+<!--                app:cardCornerRadius="8dp"-->
+<!--                app:cardElevation="8dp"-->
+<!--                app:strokeColor="#f00"-->
+<!--                app:strokeWidth="2dp">-->
 
-                <RelativeLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:background="#DDEADE">
+<!--                <RelativeLayout-->
+<!--                    android:layout_width="wrap_content"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:background="#DDEADE">-->
 
-                    <ImageView
-                        android:id="@+id/iconS"
-                        android:layout_width="55dp"
-                        android:layout_height="53dp"
-                        android:layout_alignParentTop="true"
-                        android:layout_marginTop="0dp"
-                        android:padding="5dp"
-                        android:src="@drawable/folder" />
+<!--                    <ImageView-->
+<!--                        android:id="@+id/iconS"-->
+<!--                        android:layout_width="55dp"-->
+<!--                        android:layout_height="53dp"-->
+<!--                        android:padding="5dp"-->
+<!--                        android:src="@drawable/folder" />-->
 
-                    <RelativeLayout
-                        android:layout_width="259dp"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="0dp"
-                        android:layout_toEndOf="@+id/iconS"
-                        android:layout_weight="1"
-                        android:orientation="vertical">
+<!--                    <RelativeLayout-->
+<!--                        android:layout_width="259dp"-->
+<!--                        android:layout_height="wrap_content"-->
+<!--                        android:layout_alignBottom="@+id/iconS"-->
+<!--                        android:layout_alignParentTop="true"-->
+<!--                        android:layout_marginStart="0dp"-->
+<!--                        android:layout_marginTop="3dp"-->
+<!--                        android:layout_marginBottom="1dp"-->
+<!--                        android:layout_toEndOf="@+id/iconS"-->
+<!--                        android:layout_weight="1"-->
+<!--                        android:orientation="vertical">-->
 
-                        <TextView
-                            android:id="@+id/tvFileName"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_alignParentStart="true"
-                            android:layout_alignParentTop="true"
-                            android:layout_marginStart="9dp"
-                            android:layout_marginLeft="10dp"
-                            android:layout_marginTop="4dp"
-                            android:padding="2dp"
-                            android:paddingTop="10dp"
-                            android:paddingBottom="10dp"
-                            android:text="File Name nnnnnnnnnnnnnnnnnnnnnnnnnn"
-                            android:textAppearance="?android:attr/textAppearanceMedium"
-                            android:textColor="#4d4d4d"
-                            android:textStyle="bold" />
+<!--                        <TextView-->
+<!--                            android:id="@+id/tvFileName"-->
+<!--                            android:layout_width="wrap_content"-->
+<!--                            android:layout_height="wrap_content"-->
+<!--                            android:layout_alignParentStart="true"-->
+<!--                            android:layout_alignParentTop="true"-->
+<!--                            android:layout_marginStart="9dp"-->
+<!--                            android:layout_marginLeft="10dp"-->
+<!--                            android:layout_marginTop="4dp"-->
+<!--                            android:padding="2dp"-->
+<!--                            android:paddingTop="10dp"-->
+<!--                            android:paddingBottom="10dp"-->
+<!--                            android:text="File Name nnnnnnnn"-->
+<!--                            android:textAppearance="?android:attr/textAppearanceMedium"-->
+<!--                            android:textColor="#4d4d4d"-->
+<!--                            android:textStyle="bold" />-->
 
-                        <TextView
-                            android:id="@+id/tvSent"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_below="@+id/tvFileName"
-                            android:layout_alignStart="@+id/tvFileName"
-                            android:layout_marginStart="0dp"
-                            android:layout_marginTop="1dp"
-                            android:text="Sent"
-                            android:textSize="12dp" />
+<!--                        <TextView-->
+<!--                            android:id="@+id/tvSent"-->
+<!--                            android:layout_width="wrap_content"-->
+<!--                            android:layout_height="16dp"-->
+<!--                            android:layout_below="@+id/tvFileName"-->
+<!--                            android:layout_alignParentStart="true"-->
+<!--                            android:layout_alignParentBottom="true"-->
+<!--                            android:layout_marginStart="13dp"-->
+<!--                            android:layout_marginTop="1dp"-->
+<!--                            android:layout_marginBottom="0dp"-->
+<!--                            android:text="Sent"-->
+<!--                            android:textSize="12dp" />-->
 
-                        <ProgressBar
-                            android:id="@+id/pbrSent"
-                            style="?android:attr/progressBarStyleHorizontal"
-                            android:layout_width="159dp"
-                            android:layout_height="11dp"
-                            android:layout_alignTop="@+id/tvSent"
-                            android:layout_marginStart="7dp"
-                            android:layout_marginTop="3dp"
-                            android:layout_toEndOf="@+id/tvSent" />
+<!--                        <ProgressBar-->
+<!--                            android:id="@+id/pbrSent"-->
+<!--                            style="?android:attr/progressBarStyleHorizontal"-->
+<!--                            android:layout_width="159dp"-->
+<!--                            android:layout_height="11dp"-->
+<!--                            android:layout_alignTop="@+id/tvSent"-->
+<!--                            android:layout_alignParentBottom="true"-->
+<!--                            android:layout_marginStart="11dp"-->
+<!--                            android:layout_marginTop="2dp"-->
+<!--                            android:layout_marginBottom="3dp"-->
+<!--                            android:layout_toEndOf="@+id/tvSent" />-->
 
-                        <TextView
-                            android:id="@+id/tvSize"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_alignTop="@+id/pbrSent"
-                            android:layout_alignEnd="@+id/tvFileName"
-                            android:layout_alignBottom="@+id/pbrSent"
-                            android:layout_marginStart="7dp"
-                            android:layout_marginTop="-2dp"
-                            android:layout_marginEnd="8dp"
-                            android:layout_marginBottom="-2dp"
-                            android:layout_toEndOf="@+id/pbrSent"
-                            android:text="length"
-                            android:textSize="12dp" />
-                    </RelativeLayout>
+<!--                        <TextView-->
+<!--                            android:id="@+id/tvSize"-->
+<!--                            android:layout_width="wrap_content"-->
+<!--                            android:layout_height="wrap_content"-->
+<!--                            android:layout_below="@+id/title"-->
+<!--                            android:layout_alignParentEnd="true"-->
+<!--                            android:layout_alignParentBottom="true"-->
+<!--                            android:layout_marginStart="5dp"-->
+<!--                            android:layout_marginTop="0dp"-->
+<!--                            android:layout_marginEnd="10dp"-->
+<!--                            android:layout_marginBottom="-1dp"-->
+<!--                            android:layout_toEndOf="@+id/progressBar2"-->
+<!--                            android:text="length"-->
+<!--                            android:textSize="12dp" />-->
+<!--                    </RelativeLayout>-->
 
-                </RelativeLayout>
+<!--                </RelativeLayout>-->
 
-            </com.google.android.material.card.MaterialCardView>
+<!--            </com.google.android.material.card.MaterialCardView>-->
+
 
         </LinearLayout>
+
 
     </ScrollView>
 
@@ -123,10 +140,59 @@
         android:id="@+id/btnAddSend"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="10dp"
         android:onClick="addFile"
         android:text="Add file"
-        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/scrollView2" />
-</androidx.constraintlayout.widget.ConstraintLayout>
+
+
+
+</RelativeLayout>
+
+<!--<?xml version="1.0" encoding="utf-8"?>-->
+<!--<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"-->
+<!--    xmlns:app="http://schemas.android.com/apk/res-auto"-->
+<!--    xmlns:tools="http://schemas.android.com/tools"-->
+<!--    android:layout_width="match_parent"-->
+<!--    android:layout_height="match_parent"-->
+<!--    tools:context=".Sharing">-->
+
+<!--    <ScrollView-->
+
+<!--        android:id="@+id/scrollView2"-->
+<!--        android:layout_width="415sp"-->
+<!--        android:layout_height="550sp"-->
+<!--        android:minHeight="600sp"-->
+<!--        android:padding="10dp"-->
+<!--        app:layout_constraintBottom_toBottomOf="parent"-->
+<!--        app:layout_constraintTop_toTopOf="parent"-->
+<!--        app:layout_constraintVertical_bias="0.138"-->
+<!--        tools:ignore="MissingConstraints"-->
+<!--        tools:layout_editor_absoluteX="-2dp">-->
+
+<!--        <LinearLayout-->
+<!--            android:id="@+id/scrShare"-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:orientation="vertical">-->
+
+
+<!--        </LinearLayout>-->
+
+<!--    </ScrollView>-->
+
+<!--    <Button-->
+<!--        android:id="@+id/btnAddSend"-->
+<!--        android:layout_width="wrap_content"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:onClick="addFile"-->
+<!--        android:text="Add file"-->
+<!--        app:layout_constraintBottom_toBottomOf="parent"-->
+<!--        app:layout_constraintEnd_toEndOf="parent"-->
+<!--        app:layout_constraintStart_toStartOf="parent"-->
+<!--        app:layout_constraintTop_toBottomOf="@+id/scrollView2" />-->
+<!--</androidx.constraintlayout.widget.ConstraintLayout>-->

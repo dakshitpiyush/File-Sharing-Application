@@ -28,17 +28,15 @@
                 android:id="@+id/iconS"
                 android:layout_width="55dp"
                 android:layout_height="53dp"
+                android:layout_alignParentTop="true"
+                android:layout_marginTop="0dp"
                 android:padding="5dp"
                 android:src="@drawable/folder" />
 
             <RelativeLayout
                 android:layout_width="259dp"
-                android:layout_height="56dp"
-                android:layout_alignBottom="@+id/iconS"
-                android:layout_alignParentTop="true"
+                android:layout_height="wrap_content"
                 android:layout_marginStart="0dp"
-                android:layout_marginTop="3dp"
-                android:layout_marginBottom="1dp"
                 android:layout_toEndOf="@+id/iconS"
                 android:layout_weight="1"
                 android:orientation="vertical">
@@ -55,7 +53,7 @@
                     android:padding="2dp"
                     android:paddingTop="10dp"
                     android:paddingBottom="10dp"
-                    android:text="File Name"
+                    android:text="File Name nnnnnnnnnnnnnnnnnnnnnnnnnn"
                     android:textAppearance="?android:attr/textAppearanceMedium"
                     android:textColor="#4d4d4d"
                     android:textStyle="bold" />
@@ -63,40 +61,36 @@
                 <TextView
                     android:id="@+id/tvSent"
                     android:layout_width="wrap_content"
-                    android:layout_height="16dp"
+                    android:layout_height="wrap_content"
                     android:layout_below="@+id/tvFileName"
-                    android:layout_alignParentStart="true"
-                    android:layout_alignParentBottom="true"
-                    android:layout_marginStart="13dp"
+                    android:layout_alignStart="@+id/tvFileName"
+                    android:layout_marginStart="0dp"
                     android:layout_marginTop="1dp"
-                    android:layout_marginBottom="0dp"
                     android:text="Sent"
                     android:textSize="12dp" />
 
                 <ProgressBar
                     android:id="@+id/pbrSent"
                     style="?android:attr/progressBarStyleHorizontal"
-                    android:layout_width="154dp"
-                    android:layout_height="wrap_content"
+                    android:layout_width="159dp"
+                    android:layout_height="11dp"
                     android:layout_alignTop="@+id/tvSent"
-                    android:layout_alignParentBottom="true"
-                    android:layout_marginStart="11dp"
-                    android:layout_marginTop="2dp"
-                    android:layout_marginBottom="3dp"
+                    android:layout_marginStart="7dp"
+                    android:layout_marginTop="3dp"
                     android:layout_toEndOf="@+id/tvSent" />
 
                 <TextView
                     android:id="@+id/tvSize"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_below="@+id/title"
-                    android:layout_alignParentEnd="true"
-                    android:layout_alignParentBottom="true"
-                    android:layout_marginStart="5dp"
-                    android:layout_marginTop="0dp"
-                    android:layout_marginEnd="10dp"
-                    android:layout_marginBottom="-1dp"
-                    android:layout_toEndOf="@+id/progressBar2"
+                    android:layout_alignTop="@+id/pbrSent"
+                    android:layout_alignEnd="@+id/tvFileName"
+                    android:layout_alignBottom="@+id/pbrSent"
+                    android:layout_marginStart="7dp"
+                    android:layout_marginTop="-2dp"
+                    android:layout_marginEnd="8dp"
+                    android:layout_marginBottom="-2dp"
+                    android:layout_toEndOf="@+id/pbrSent"
                     android:text="length"
                     android:textSize="12dp" />
             </RelativeLayout>

@@ -11,6 +11,7 @@ import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -387,6 +388,8 @@ public class Sharing extends AppCompatActivity {
         fileNameView.setText(fileName);
         fileSizeView.setText(getSize((double) size));
         progressBar.setMax((int) size);
+        LinearLayout.LayoutParams params=new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        params.gravity=Gravity.RIGHT;
         scroll.addView(fileShareView);
         curReceiveView = fileShareView;
     }

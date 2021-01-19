@@ -71,7 +71,7 @@ public class Sharing extends AppCompatActivity {
     private Handler handler;
     private LayoutInflater layoutInflater;
     private int curSend = 0;
-    private ArrayList<View> sendViewList = new ArrayList<>();
+    private final ArrayList<View> sendViewList = new ArrayList<>();
     private View curReceiveView;
     public final int BUFFER_SIZE=4096;
     private WifiP2pManager wifiP2pManager;
@@ -145,9 +145,10 @@ public class Sharing extends AppCompatActivity {
                         makeProgress(true, 4096);
                         break;
                     case 6:
-//                        Toast.makeText(getApplicationContext(), "tuza sender palala", Toast.LENGTH_LONG).show();
-//                        Intent intent = new Intent(getApplicationContext(), MainActivity.class);
-//                        navigateUpTo(intent);
+                        Toast.makeText(getApplicationContext(), "tuza sender palala", Toast.LENGTH_LONG).show();
+                        Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+                        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                        startActivity(intent);
                         break;
                 }
                 return true;
@@ -222,6 +223,12 @@ public class Sharing extends AppCompatActivity {
                         fos.close();
                     }catch (EOFException e){
                         handler.obtainMessage(6).sendToTarget();
+                        try {
+                            socket.close();
+                        }catch(IOException t){
+
+                        }
+                        break;
                     }
                     catch (IOException e) {
                         e.printStackTrace();
@@ -383,7 +390,7 @@ public class Sharing extends AppCompatActivity {
 
     private String getSize(double length) {
         if (length < 1024) {
-            return String.valueOf(length) + " B";
+            return length + " B";
         } else if (length / 1024 < 1024) {
             return String.format("%.1f", length / 1024) + " KB";
         } else if (length / (1024 * 1024) < 1024) {
@@ -444,7 +451,7 @@ public class Sharing extends AppCompatActivity {
 
             @Override
             public void onFailure(int reason) {
-                Toast.makeText(getApplicationContext(), "Not removed error code"+ String.valueOf(reason), Toast.LENGTH_LONG).show();
+                Toast.makeText(getApplicationContext(), "Not removed error code"+ reason, Toast.LENGTH_LONG).show();
             }
         });
         Log.v("destroy", "activity destroye");

@@ -96,7 +96,7 @@
                     android:layout_marginTop="0dp"
                     android:layout_marginEnd="10dp"
                     android:layout_marginBottom="-1dp"
-                    android:layout_toEndOf="@+id/progressBar2"
+                    android:layout_toEndOf="@+id/pbrSent"
                     android:text="length"
                     android:textSize="12dp" />
             </RelativeLayout>

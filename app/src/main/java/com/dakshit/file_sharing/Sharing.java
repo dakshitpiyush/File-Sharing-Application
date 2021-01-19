@@ -36,6 +36,7 @@ import java.io.OutputStream;
 import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.SocketException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -221,7 +222,9 @@ public class Sharing extends AppCompatActivity {
                             }
                         }
                         fos.close();
-                    }catch (EOFException e){
+                    }
+
+                    catch (EOFException e){
                         handler.obtainMessage(6).sendToTarget();
                         try {
                             socket.close();
@@ -408,11 +411,12 @@ public class Sharing extends AppCompatActivity {
 
 
     private void makeProgress(boolean isSend, int file_size) {
-//        if(selectedFileList!=null && curSend>=selectedFileList.size()){
-//            return;
-//        }
-        if(!isSend){
+
+        if(isSend){
             Log.v("sharing", ""+file_size);
+            if(selectedFileList==null || curSend>=selectedFileList.size()){
+                return;
+            }
         }
         int progress;
         View fileSharingView;

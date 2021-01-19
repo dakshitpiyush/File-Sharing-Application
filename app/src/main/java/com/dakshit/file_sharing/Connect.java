@@ -30,6 +30,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -100,7 +101,7 @@ public class Connect extends AppCompatActivity {
 
             @Override
             public void onFailure(int reason) {
-                message.setText("searching fails, Retry error code"+ String.valueOf(reason));
+                message.setText("searching fails, Retry error code"+ reason);
             }
         });
         peerList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -122,7 +123,7 @@ public class Connect extends AppCompatActivity {
                         String getRes;
                         if (reason == WifiP2pManager.P2P_UNSUPPORTED)
                             getRes = "device is unsupported";
-                        else if (reason == wifiP2pManager.BUSY) getRes = "device is busy";
+                        else if (reason == WifiP2pManager.BUSY) getRes = "device is busy";
                         else getRes = "unknown error occured try again";
                         message.setText("Fail to connect device " + getRes);
                     }
@@ -191,11 +192,31 @@ public class Connect extends AppCompatActivity {
         unregisterReceiver(broadcastReceiver);
     }
 
+    protected void onDestroy() {
+        super.onDestroy();
+        wifiP2pManager.removeGroup(channel, new WifiP2pManager.ActionListener() {
+            @Override
+            public void onSuccess() {
+                Toast.makeText(getApplicationContext(), "group removed", Toast.LENGTH_LONG).show();
+            }
+
+            @Override
+            public void onFailure(int reason) {
+                Toast.makeText(getApplicationContext(), "Not removed error code"+ reason, Toast.LENGTH_LONG).show();
+            }
+        });
+        Log.v("destroy", "activity destroye");
+    }
+    @Override
+    protected void onStop() {
+        super.onStop();
+        Log.v("stop", "Activity is stoping");
+    }
 
     private static class WifiDirectBroadcastReceiver extends BroadcastReceiver {
-        private WifiP2pManager wifiP2pManager;
-        private WifiP2pManager.Channel channel;
-        private Connect activity;
+        private final WifiP2pManager wifiP2pManager;
+        private final WifiP2pManager.Channel channel;
+        private final Connect activity;
 
         public WifiDirectBroadcastReceiver(WifiP2pManager wifiP2pManager, WifiP2pManager.Channel channel, Connect activity) {
             this.wifiP2pManager = wifiP2pManager;
@@ -207,7 +228,7 @@ public class Connect extends AppCompatActivity {
         public void onReceive(Context context, Intent intent) {
             String action = intent.getAction();
             if (WifiP2pManager.WIFI_P2P_STATE_CHANGED_ACTION.equals(action)) {
-                if (intent.getIntExtra(wifiP2pManager.EXTRA_WIFI_STATE, -1) == WifiP2pManager.WIFI_P2P_STATE_ENABLED) {
+                if (intent.getIntExtra(WifiP2pManager.EXTRA_WIFI_STATE, -1) == WifiP2pManager.WIFI_P2P_STATE_ENABLED) {
                     Toast.makeText(context, "wifi is on", Toast.LENGTH_LONG).show();
                     activity.discover(null);
                 } else {
@@ -233,11 +254,6 @@ public class Connect extends AppCompatActivity {
 
             }
         }
-    }
-    @Override
-    protected void onStop() {
-        super.onStop();
-        Log.v("stop", "Activity is stoping");
     }
 
 }

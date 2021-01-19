@@ -11,6 +11,7 @@ import android.net.wifi.WifiManager;
 import android.net.wifi.p2p.WifiP2pInfo;
 import android.net.wifi.p2p.WifiP2pManager;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -65,9 +66,9 @@ public class Recieve extends AppCompatActivity {
         message = (TextView) findViewById(R.id.tvRecived);
         retry = (Button) findViewById(R.id.btnRecRetry);
 
-        wifiManager = (WifiManager) getApplicationContext().getSystemService(this.WIFI_SERVICE);
+        wifiManager = (WifiManager) getApplicationContext().getSystemService(WIFI_SERVICE);
         wifiManager.setWifiEnabled(true);
-        wifiP2pManager = (WifiP2pManager) getApplicationContext().getSystemService(this.WIFI_P2P_SERVICE);
+        wifiP2pManager = (WifiP2pManager) getApplicationContext().getSystemService(WIFI_P2P_SERVICE);
         channel = wifiP2pManager.initialize(this, getMainLooper(), null);
 
         wifiP2pManager.removeGroup(channel, new WifiP2pManager.ActionListener() {
@@ -101,7 +102,7 @@ public class Recieve extends AppCompatActivity {
 
             @Override
             public void onFailure(int reason) {
-                message.setText("searching fails, Retry error code"+ String.valueOf(reason));
+                message.setText("searching fails, Retry error code"+ reason);
             }
         });
 
@@ -128,11 +129,26 @@ public class Recieve extends AppCompatActivity {
         }
     };
 
+    protected void onDestroy() {
+        super.onDestroy();
+        wifiP2pManager.removeGroup(channel, new WifiP2pManager.ActionListener() {
+            @Override
+            public void onSuccess() {
+                //Toast.makeText(getApplicationContext(), "group removed", Toast.LENGTH_LONG).show();
+            }
+
+            @Override
+            public void onFailure(int reason) {
+                //Toast.makeText(getApplicationContext(), "Not removed error code"+ String.valueOf(reason), Toast.LENGTH_LONG).show();
+            }
+        });
+        Log.v("destroy", "activity destroye");
+    }
 
     private static class WifiBroadcastReciever extends BroadcastReceiver {
-        private Recieve activity;
-        private WifiP2pManager wifiP2pManager;
-        private WifiP2pManager.Channel channel;
+        private final Recieve activity;
+        private final WifiP2pManager wifiP2pManager;
+        private final WifiP2pManager.Channel channel;
 
         public WifiBroadcastReciever(WifiP2pManager wifiP2pManager, WifiP2pManager.Channel channel, Recieve activity) {
             this.channel = channel;
@@ -144,7 +160,7 @@ public class Recieve extends AppCompatActivity {
         public void onReceive(Context context, Intent intent) {
             String action = intent.getAction();
             if (WifiP2pManager.WIFI_P2P_STATE_CHANGED_ACTION.equals(action)) {
-                if (intent.getIntExtra(wifiP2pManager.EXTRA_WIFI_STATE, -1) == WifiP2pManager.WIFI_P2P_STATE_ENABLED) {
+                if (intent.getIntExtra(WifiP2pManager.EXTRA_WIFI_STATE, -1) == WifiP2pManager.WIFI_P2P_STATE_ENABLED) {
                     Toast.makeText(context, "wifi is on", Toast.LENGTH_LONG).show();
                 } else {
                     Toast.makeText(context, "wifi is off", Toast.LENGTH_LONG).show();

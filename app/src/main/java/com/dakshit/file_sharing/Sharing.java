@@ -71,7 +71,7 @@ public class Sharing extends AppCompatActivity {
     private Handler handler;
     private LayoutInflater layoutInflater;
     private int curSend = 0;
-    private final ArrayList<View> sendViewList = new ArrayList<>();
+    private ArrayList<View> sendViewList = new ArrayList<>();
     private View curReceiveView;
     public final int BUFFER_SIZE=4096;
     private WifiP2pManager wifiP2pManager;
@@ -139,16 +139,15 @@ public class Sharing extends AppCompatActivity {
                         //Todo: kaytari kara file gelyavar
                         break;
                     case DATA_PART_RECEIVED:
-                        makeProgress(false);
+                        makeProgress(false,(int) msg.obj);
                         break;
                     case DATA_PART_SENT:
-                        makeProgress(true);
+                        makeProgress(true, 4096);
                         break;
                     case 6:
-                        Toast.makeText(Sharing.this, "tuza sender palala", Toast.LENGTH_LONG).show();
-                        Intent intent = new Intent(Sharing.this, MainActivity.class);
-                        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                        startActivity(intent);
+//                        Toast.makeText(getApplicationContext(), "tuza sender palala", Toast.LENGTH_LONG).show();
+//                        Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+//                        navigateUpTo(intent);
                         break;
                 }
                 return true;
@@ -208,18 +207,21 @@ public class Sharing extends AppCompatActivity {
                         msg.sendToTarget();
                         File file = new File(parentFolder + fileName);
                         FileOutputStream fos = new FileOutputStream(file);
+                        long file_size = fileSize / 100;
+                        long exp = fileSize - file_size;
                         while ((bytes = finalInputStream.read(data, 0, (int)Math.min(BUFFER_SIZE, fileSize))) !=-1 && fileSize>0) {
                             fileSize -= bytes;
                             fos.write(data, 0, bytes);
-                            handler.obtainMessage(DATA_PART_RECEIVED).sendToTarget();
+                            if(fileSize <= exp){
+                                exp = fileSize - file_size;
+                                Message msgg = handler.obtainMessage(DATA_PART_RECEIVED, (int)file_size);
+                                msgg.setTarget(handler);
+                                msgg.sendToTarget();
+                            }
                         }
                         fos.close();
                     }catch (EOFException e){
                         handler.obtainMessage(6).sendToTarget();
-                        try{socket.close();
-                        }catch(IOException r){
-                        }
-                        break;
                     }
                     catch (IOException e) {
                         e.printStackTrace();
@@ -250,11 +252,11 @@ public class Sharing extends AppCompatActivity {
                         finalDos.writeUTF(fileName);
                         FileInputStream fis = new FileInputStream(file);
                         byte[] data = new byte[BUFFER_SIZE];
-
+                        long file_size = fileSize / 100;
                         while (fis.read(data) != -1) {
                             finalOutputStream.write(data, 0, (int)Math.min(fileSize, data.length));
                             fileSize-=BUFFER_SIZE;
-                            Message msg = handler.obtainMessage(DATA_PART_SENT);
+                            Message msg = handler.obtainMessage(DATA_PART_SENT,(int)4096 );
                             msg.setTarget(handler);
                             msg.sendToTarget();
                         }
@@ -381,7 +383,7 @@ public class Sharing extends AppCompatActivity {
 
     private String getSize(double length) {
         if (length < 1024) {
-            return length + " B";
+            return String.valueOf(length) + " B";
         } else if (length / 1024 < 1024) {
             return String.format("%.1f", length / 1024) + " KB";
         } else if (length / (1024 * 1024) < 1024) {
@@ -398,15 +400,18 @@ public class Sharing extends AppCompatActivity {
 
 
 
-    private void makeProgress(boolean isSend) {
+    private void makeProgress(boolean isSend, int file_size) {
 //        if(selectedFileList!=null && curSend>=selectedFileList.size()){
 //            return;
 //        }
+        if(!isSend){
+            Log.v("sharing", ""+file_size);
+        }
         int progress;
         View fileSharingView;
         fileSharingView = isSend ? sendViewList.get(curSend) : curReceiveView;
         ProgressBar progressBar = (ProgressBar) fileSharingView.findViewById(R.id.pbrSent);
-        progress = Math.min(progressBar.getProgress() + BUFFER_SIZE, progressBar.getMax());
+        progress = Math.min(progressBar.getProgress() + file_size, progressBar.getMax());
         progressBar.setProgress(progress);
         TextView sentView = fileSharingView.findViewById(R.id.tvSent);
         sentView.setText(getSize(progress));
@@ -439,7 +444,7 @@ public class Sharing extends AppCompatActivity {
 
             @Override
             public void onFailure(int reason) {
-                Toast.makeText(getApplicationContext(), "Not removed error code"+ reason, Toast.LENGTH_LONG).show();
+                Toast.makeText(getApplicationContext(), "Not removed error code"+ String.valueOf(reason), Toast.LENGTH_LONG).show();
             }
         });
         Log.v("destroy", "activity destroye");

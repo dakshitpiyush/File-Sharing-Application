@@ -3,6 +3,7 @@ package com.dakshit.file_sharing;
 import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.location.LocationManager;
 import android.net.Uri;
 import android.net.wifi.WifiConfiguration;
 import android.net.wifi.WifiManager;
@@ -13,6 +14,7 @@ import android.view.View;
 import android.widget.TextView;
 
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
@@ -21,10 +23,7 @@ import java.util.ArrayList;
 
 
 public class MainActivity extends AppCompatActivity {
-    private int STORAGE_PERMISSION_CODE = 1;
-    private WifiManager wifiManager;
-    private WifiManager.LocalOnlyHotspotReservation hotspotReservation;
-    private WifiConfiguration currentConfig;
+    private final int STORAGE_PERMISSION_CODE = 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -75,6 +74,7 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
         if (resultCode == RESULT_OK && requestCode == 1001 && data != null) {
             ArrayList<String> selectedFileList = new ArrayList<>();
             if (data.getClipData() != null) {
@@ -94,7 +94,7 @@ public class MainActivity extends AppCompatActivity {
             startActivity(connect);
         }
         if (resultCode == RESULT_OK && requestCode == 1002 && data != null) {
-            ArrayList<String> selectedFileList=data.getStringArrayListExtra("fileList");
+            ArrayList<String> selectedFileList = data.getStringArrayListExtra("fileList");
             Intent connect = new Intent(this, Connect.class);
             connect.putExtra("fileList", selectedFileList);
             startActivity(connect);

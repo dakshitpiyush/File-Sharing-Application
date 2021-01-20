@@ -18,6 +18,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
+import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -72,20 +73,19 @@ public class Sharing extends AppCompatActivity {
     private ArrayList<String> selectedFileList = new ArrayList<>();
     private Handler handler;
     private LayoutInflater layoutInflater;
-    private int curSend = 0;
-    private final ArrayList<View> sendViewList = new ArrayList<>();
-    private View curReceiveView;
+    public static final int SOCKET_CREATED=1,
+            FILE_RECEIVING=2,
+            FILE_SENT=3,
+            DATA_PART_RECEIVED=4,
+            DATA_PART_SENT=5;
+    private static final int PORT_NO=8069;
     public final int BUFFER_SIZE=4096;
     private WifiP2pManager wifiP2pManager;
     private WifiP2pManager.Channel channel;
     private Socket socket;
     private ServerSocket sc=null;
-
-    public static final int SOCKET_CREATED=1;
-    public static final int FILE_RECEIVING=2;
-    public static final int FILE_SENT=3;
-    public static final int DATA_PART_RECEIVED=4;
-    public static final int DATA_PART_SENT=5;
+    private final ArrayList<View> sendViewList = new ArrayList<>(), receiveViewList=new ArrayList<>();
+    private int curSend = 0, curReceive=0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -94,7 +94,7 @@ public class Sharing extends AppCompatActivity {
         Intent parent = getIntent();
         scroll = findViewById(R.id.scrShare);
         layoutInflater = getLayoutInflater();
-        info = (WifiP2pInfo) parent.getParcelableExtra("wifiP2pInfo");
+        info = parent.getParcelableExtra("wifiP2pInfo");
         if (parent.hasExtra("selectedFileList"))
             selectedFileList = parent.getStringArrayListExtra("selectedFileList");
 
@@ -108,15 +108,13 @@ public class Sharing extends AppCompatActivity {
                         Log.v("sc","server created");
                         sc = new ServerSocket();
                         sc.setReuseAddress(true);
-                        sc.bind(new InetSocketAddress(8069));
+                        sc.bind(new InetSocketAddress(PORT_NO));
                         socket = sc.accept();
 
                     } else {
                         socket = new Socket();
                         Log.v("sc","client created");
-                        //todo:decide best statergy to avoid port already used situation
-                        socket.connect(new InetSocketAddress(info.groupOwnerAddress.getHostName(), 8069), 5000);
-
+                        socket.connect(new InetSocketAddress(info.groupOwnerAddress.getHostName(), PORT_NO), 5000);
                     }
                     Message msg = handler.obtainMessage(SOCKET_CREATED, socket);
                     msg.setTarget(handler);
@@ -141,10 +139,10 @@ public class Sharing extends AppCompatActivity {
                         //Todo: kaytari kara file gelyavar
                         break;
                     case DATA_PART_RECEIVED:
-                        makeProgress(false,(int) msg.obj);
+                        makeProgress(false, msg.arg2, msg.arg1);
                         break;
                     case DATA_PART_SENT:
-                        makeProgress(true, 4096);
+                        makeProgress(true, BUFFER_SIZE, msg.arg1);
                         break;
                     case 6:
                         Toast.makeText(getApplicationContext(), "tuza sender palala", Toast.LENGTH_LONG).show();
@@ -217,12 +215,13 @@ public class Sharing extends AppCompatActivity {
                             fos.write(data, 0, bytes);
                             if(fileSize <= exp){
                                 exp = fileSize - file_size;
-                                Message msgg = handler.obtainMessage(DATA_PART_RECEIVED, (int)file_size);
+                                Message msgg = handler.obtainMessage(DATA_PART_RECEIVED, curReceive, (int)file_size);
                                 msgg.setTarget(handler);
                                 msgg.sendToTarget();
                             }
                         }
                         fos.close();
+                        curReceive++;
                     }
 
                     catch (EOFException e){
@@ -267,7 +266,7 @@ public class Sharing extends AppCompatActivity {
                         while (fis.read(data) != -1) {
                             finalOutputStream.write(data, 0, (int)Math.min(fileSize, data.length));
                             fileSize-=BUFFER_SIZE;
-                            Message msg = handler.obtainMessage(DATA_PART_SENT,(int)4096 );
+                            Message msg = handler.obtainMessage(DATA_PART_SENT, curSend, 4096);
                             msg.setTarget(handler);
                             msg.sendToTarget();
                         }
@@ -363,7 +362,9 @@ public class Sharing extends AppCompatActivity {
         progressBar.setMax((int) curFile.length());
         fileNameView.setText(fileName);
         fileSizeView.setText(getSize((double) curFile.length()));
-        scroll.addView(fileShareView);
+        LinearLayout.LayoutParams params=new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        params.gravity=Gravity.RIGHT;
+        scroll.addView(fileShareView, params);
         sendViewList.add(fileShareView);
 
     }
@@ -388,8 +389,9 @@ public class Sharing extends AppCompatActivity {
         fileNameView.setText(fileName);
         fileSizeView.setText(getSize((double) size));
         progressBar.setMax((int) size);
+
         scroll.addView(fileShareView);
-        curReceiveView = fileShareView;
+        receiveViewList.add(fileShareView);
     }
 
     private String getSize(double length) {
@@ -414,18 +416,12 @@ public class Sharing extends AppCompatActivity {
 
 
 
-    private void makeProgress(boolean isSend, int file_size) {
+    private void makeProgress(boolean isSend, int file_size, int index) {
 
-        if(isSend){
-            Log.v("sharing", ""+file_size);
-            if(selectedFileList==null || curSend>=selectedFileList.size()){
-                return;
-            }
-        }
         int progress;
         View fileSharingView;
-        fileSharingView = isSend ? sendViewList.get(curSend) : curReceiveView;
-        ProgressBar progressBar = (ProgressBar) fileSharingView.findViewById(R.id.pbrSent);
+        fileSharingView = isSend ? sendViewList.get(index) : receiveViewList.get(index);
+        ProgressBar progressBar = fileSharingView.findViewById(R.id.pbrSent);
         progress = Math.min(progressBar.getProgress() + file_size, progressBar.getMax());
         progressBar.setProgress(progress);
         TextView sentView = fileSharingView.findViewById(R.id.tvSent);

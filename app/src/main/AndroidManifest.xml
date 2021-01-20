@@ -26,6 +26,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.FileSharing">
+        
         <activity android:name=".Sharing"></activity>
         <activity android:name=".Recieve" />
         <activity android:name=".Connect" />

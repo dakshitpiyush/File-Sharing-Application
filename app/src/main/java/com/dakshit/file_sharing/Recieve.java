@@ -30,32 +30,6 @@ public class Recieve extends AppCompatActivity {
 
 
     private WifiBroadcastReciever wifiBroadcastReciever;
-    //  public Handler handler = new Handler(new Handler.Callback() {
-//        @Override
-//        public boolean handleMessage(@NonNull Message msg) {
-//            String fileName;
-//            switch (msg.what) {
-//                case 1:
-//                    fileName = (String) msg.obj;
-//                    message.setText("seneding fails of file" + fileName);
-//                    break;
-//                case 2:
-//                    fileName = (String) msg.obj;
-//                    message.setText("seneding sucsess file" + fileName);
-//                    break;
-//                case 3:
-//                    //sended part of data
-//                    fileName = (String) msg.obj;
-//                    break;
-//                case 4:
-//                    //recieved some part of data
-//                    fileName = (String) msg.obj;
-//                    break;
-//
-//            }
-//            return true;
-//        }
-//    });
     private Button retry;
 
     @Override
@@ -63,8 +37,8 @@ public class Recieve extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_recieve);
 
-        message = (TextView) findViewById(R.id.tvRecived);
-        retry = (Button) findViewById(R.id.btnRecRetry);
+        message = findViewById(R.id.tvRecived);
+        retry = findViewById(R.id.btnRecRetry);
 
         wifiManager = (WifiManager) getApplicationContext().getSystemService(WIFI_SERVICE);
         wifiManager.setWifiEnabled(true);

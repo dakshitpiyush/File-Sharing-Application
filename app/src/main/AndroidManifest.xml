@@ -28,8 +28,10 @@
         android:theme="@style/Theme.FileSharing">
         
         <activity android:name=".Sharing"></activity>
+
         <activity android:name=".Recieve" />
         <activity android:name=".Connect" />
+        <activity android:name=".Landing" />
         <activity android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

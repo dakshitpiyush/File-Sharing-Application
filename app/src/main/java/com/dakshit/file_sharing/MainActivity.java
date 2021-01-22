@@ -1,39 +1,73 @@
 package com.dakshit.file_sharing;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.content.res.Resources;
 import android.location.LocationManager;
 import android.net.Uri;
 import android.net.wifi.WifiConfiguration;
 import android.net.wifi.WifiManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.PersistableBundle;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
-
+import androidx.fragment.app.Fragment;
 import java.util.ArrayList;
 
 
 public class MainActivity extends AppCompatActivity {
     private final int STORAGE_PERMISSION_CODE = 1;
-
+    private TextView tt;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+
         requestPermission(Manifest.permission.READ_EXTERNAL_STORAGE);
         requestPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE);
         requestPermission(Manifest.permission.ACCESS_FINE_LOCATION);
         requestPermission(Manifest.permission.CHANGE_WIFI_STATE);
         Log.v("start", "Activity is start");
+        tt = (TextView) findViewById(R.id.textView);
+
+        final SharedPreferences prefs = getApplicationContext().getSharedPreferences("my_preferences", Context.MODE_PRIVATE);
+        boolean is_first_time = prefs.getBoolean("first_time", true);
+        if(is_first_time){
+            Log.v("start", "ya ya ya su swagatam");
+            tt.setText("ya ya ya su swagatam");
+            Intent intent = new Intent(getApplicationContext(), Landing.class);
+            startActivity(intent);
+        }
+        else{
+            Log.v("start", "khar bol tu pahile pn ala ahes na");
+            String uname = prefs.getString("username", "kahichnahi");
+            Log.v("start", "uanem is:" + uname);
+            tt.setText(uname);
+        }
+    }
+
+    @SuppressLint("ResourceType")
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+
+
     }
 
     public void sendReceiveFile(View view) {
@@ -56,9 +90,6 @@ public class MainActivity extends AppCompatActivity {
                 Intent receiveFileIntent = new Intent(this, Recieve.class);
                 startActivity(receiveFileIntent);
             }
-        } else {
-            TextView forTest = findViewById(R.id.test);
-            forTest.setText("you do not have permission");
         }
     }
 
@@ -107,3 +138,4 @@ public class MainActivity extends AppCompatActivity {
         Log.v("stop", "Activity is stoping");
     }
 }
+

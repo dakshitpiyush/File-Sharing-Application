@@ -1,4 +1,5 @@
 <resources>
-    <string name="app_name">File-Sharing</string>
+    <string name="app_name">lena dena</string>
     <string name="retry">Retry</string>
+    <bool name="firsttime">true</bool>
 </resources>

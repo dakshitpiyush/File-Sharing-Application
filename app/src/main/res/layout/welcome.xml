@@ -24,111 +24,101 @@
         android:scrollbarStyle="outsideInset"
         android:paddingVertical="10dp"
         >
-        
-    <RadioGroup
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="150dp"
-        android:orientation="horizontal"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:ignore="MissingConstraints"
-        android:padding="2dp"
 
-        >
-
-        <RadioButton
-            android:id="@+id/profile1"
+        <RadioGroup
+            android:id="@+id/rbgProfilePhoto"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="@drawable/profile1"
-            android:button="@null"
-            android:checked="true"
-            android:layout_marginStart="20dp"
-            android:layout_marginEnd="20dp"
+            android:layout_marginTop="150dp"
+            android:orientation="horizontal"
             android:padding="2dp"
-            />
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
 
-        <RadioButton
-            android:id="@+id/profile2"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="@drawable/profile2"
-            android:button="@null"
-            android:checked="true"
-            android:layout_marginEnd="20dp"
-            android:padding="2dp"
-            />
+            tools:ignore="MissingConstraints">
 
-        <RadioButton
-            android:id="@+id/profile3"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="@drawable/profile3"
-            android:button="@null"
-            android:layout_marginEnd="20dp"
-            android:padding="2dp"/>
+            <RadioButton
+                android:id="@+id/profile1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="20dp"
+                android:layout_marginEnd="20dp"
+                android:background="@drawable/profile1"
+                android:button="@null"
+                android:padding="2dp" />
 
-        <RadioButton
-            android:id="@+id/profile4"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="@drawable/profile4"
-            android:button="@null"
-            android:layout_marginEnd="20dp"
-            android:padding="2dp"
-            />
+            <RadioButton
+                android:id="@+id/profile2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="20dp"
+                android:background="@drawable/profile2"
+                android:button="@null"
+                android:padding="2dp" />
 
-        <RadioButton
-            android:id="@+id/profile5"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="@drawable/profile5"
-            android:button="@null"
-            android:layout_marginEnd="20dp"
-            android:padding="2dp"
-            />
+            <RadioButton
+                android:id="@+id/profile3"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="20dp"
+                android:background="@drawable/profile3"
+                android:button="@null"
+                android:padding="2dp" />
 
-        <RadioButton
-            android:id="@+id/profile6"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="@drawable/profile6"
-            android:button="@null"
-            android:layout_marginEnd="20dp"
-            android:padding="2dp"
-            />
+            <RadioButton
+                android:id="@+id/profile4"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="20dp"
+                android:background="@drawable/profile4"
+                android:button="@null"
+                android:padding="2dp" />
 
-        <RadioButton
-            android:id="@+id/profile7"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="@drawable/profile7"
-            android:button="@null"
-            android:layout_marginEnd="20dp"
-            android:padding="2dp"
-            />
+            <RadioButton
+                android:id="@+id/profile5"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="20dp"
+                android:background="@drawable/profile5"
+                android:button="@null"
+                android:padding="2dp" />
 
-        <RadioButton
-            android:id="@+id/profile8"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="@drawable/profile8"
-            android:button="@null"
-            android:layout_marginEnd="20dp"
-            android:padding="2dp"
-             />
+            <RadioButton
+                android:id="@+id/profile6"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="20dp"
+                android:background="@drawable/profile6"
+                android:button="@null"
+                android:padding="2dp" />
 
-        <RadioButton
-            android:id="@+id/profile9"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="@drawable/profile9"
-            android:button="@null"
-            android:layout_marginEnd="20dp"
-            android:padding="2dp"
-            />
-    </RadioGroup>
+            <RadioButton
+                android:id="@+id/profile7"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="20dp"
+                android:background="@drawable/profile7"
+                android:button="@null"
+                android:padding="2dp" />
+
+            <RadioButton
+                android:id="@+id/profile8"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="20dp"
+                android:background="@drawable/profile8"
+                android:button="@null"
+                android:padding="2dp" />
+
+            <RadioButton
+                android:id="@+id/profile9"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="20dp"
+                android:background="@drawable/profile9"
+                android:button="@null"
+                android:padding="2dp" />
+        </RadioGroup>
     </HorizontalScrollView>
 
 

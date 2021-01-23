@@ -71,4 +71,8 @@ public class Landing extends AppCompatActivity {
         }
     }
 
+    @Override
+    public void onBackPressed() {
+        gotoMain(null);
+    }
 }

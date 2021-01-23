@@ -7,6 +7,7 @@ import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -17,6 +18,7 @@ import java.util.HashMap;
 
 public class Landing extends AppCompatActivity {
     TextView name;
+    private RadioButton radio_button;
     private final HashMap<Integer, Integer> proToImg=new HashMap(){{
         put(R.id.profile1, R.drawable.profile1);
         put(R.id.profile2, R.drawable.profile2);
@@ -28,33 +30,37 @@ public class Landing extends AppCompatActivity {
         put(R.id.profile8, R.drawable.profile8);
         put(R.id.profile9, R.drawable.profile9);
     }};
-    private RadioGroup profileRadioGroup;
-    private int rdbProfile=-1;
+    private RadioGroup profile_group;
 
+    private Drawable border;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.welcome);
 
         name = (TextView) findViewById(R.id.username);
-        profileRadioGroup=(RadioGroup) findViewById(R.id.rbgProfilePhoto);
+        profile_group =(RadioGroup) findViewById(R.id.profiles);
+        radio_button = (RadioButton) findViewById(R.id.profile2);
+        border = getDrawable(R.drawable.border);
 
-        profileRadioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+        radio_button.setForeground(border);
+        profile_group.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(RadioGroup group, int checkedId) {
                 Log.v("id", String.valueOf(checkedId));
-                rdbProfile=checkedId;
+                radio_button.setForeground(null);
+                radio_button = (RadioButton) findViewById(checkedId);
+                radio_button.setForeground(border);
+
             }
         });
+        radio_button.setChecked(true);
 
     }
     public void gotoMain(View view){
         if(name.getText() == "" || name.getText().length() <= 2){
             name.setText("");
             Toast.makeText(getApplicationContext(), "bhai nav tri neet tak", Toast.LENGTH_LONG).show();
-
-        }else if(rdbProfile==-1){
-            Toast.makeText(getApplicationContext(), "bhai ata photo pan select kar", Toast.LENGTH_LONG).show();
         }else{
             final SharedPreferences prefs = getApplicationContext().getSharedPreferences("my_preferences", Context.MODE_PRIVATE);
 
@@ -62,7 +68,7 @@ public class Landing extends AppCompatActivity {
             String ss = String.valueOf(name.getText());
             editor.putString("username", ss);
             editor.putBoolean("first_time", false);
-            editor.putInt("profilePic", proToImg.get(rdbProfile));
+            editor.putInt("profilePic", proToImg.get(profile_group.getCheckedRadioButtonId()));
             editor.apply();
             Log.v("welcome", "username : " + prefs.getString("username", "nopeeee"));
             Intent intent = new Intent(getApplicationContext(), MainActivity.class);

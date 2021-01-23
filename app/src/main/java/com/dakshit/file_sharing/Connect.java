@@ -59,6 +59,7 @@ public class Connect extends AppCompatActivity {
         wifiManager.setWifiEnabled(true);
 
 
+
         wifiP2pManager = (WifiP2pManager) getSystemService(Context.WIFI_P2P_SERVICE);
         channel = wifiP2pManager.initialize(this, getMainLooper(), null);
         broadcastReceiver = new WifiDirectBroadcastReceiver(wifiP2pManager, channel, this);

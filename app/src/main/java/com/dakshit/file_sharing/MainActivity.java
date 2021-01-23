@@ -17,6 +17,8 @@ import android.os.PersistableBundle;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.View;
+import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -32,6 +34,7 @@ import java.util.ArrayList;
 public class MainActivity extends AppCompatActivity {
     private final int STORAGE_PERMISSION_CODE = 1;
     private TextView tt;
+    private ImageView imageView;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -44,6 +47,7 @@ public class MainActivity extends AppCompatActivity {
         requestPermission(Manifest.permission.CHANGE_WIFI_STATE);
         Log.v("start", "Activity is start");
         tt = (TextView) findViewById(R.id.textView);
+        imageView=(ImageView)findViewById(R.id.profilePic);
 
         final SharedPreferences prefs = getApplicationContext().getSharedPreferences("my_preferences", Context.MODE_PRIVATE);
         boolean is_first_time = prefs.getBoolean("first_time", true);
@@ -58,6 +62,7 @@ public class MainActivity extends AppCompatActivity {
             String uname = prefs.getString("username", "kahichnahi");
             Log.v("start", "uanem is:" + uname);
             tt.setText(uname);
+            imageView.setImageResource(prefs.getInt("profilePic", R.drawable.profile1));
         }
     }
 

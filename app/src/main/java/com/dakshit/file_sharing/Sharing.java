@@ -73,13 +73,13 @@ public class Sharing extends AppCompatActivity {
     private ArrayList<String> selectedFileList = new ArrayList<>();
     private Handler handler;
     private LayoutInflater layoutInflater;
-    public static final int SOCKET_CREATED=1,
-            FILE_RECEIVING=2,
-            FILE_SENT=3,
-            DATA_PART_RECEIVED=4,
-            DATA_PART_SENT=5;
-    private static final int PORT_NO=8069;
-    public final int BUFFER_SIZE=4096;
+    public static final int SOCKET_CREATED=1;
+    public static final int FILE_RECEIVING=2;
+    public static final int FILE_SENT=3;
+    public static final int DATA_PART_SENT=5;
+    public static final int DATA_PART_RECEIVED=4;
+    public static final int PORT_NO=8069;
+    public static final int BUFFER_SIZE=4096;
     private WifiP2pManager wifiP2pManager;
     private WifiP2pManager.Channel channel;
     private Socket socket;

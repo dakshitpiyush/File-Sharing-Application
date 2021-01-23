@@ -66,13 +66,9 @@ public class Landing extends AppCompatActivity {
             editor.apply();
             Log.v("welcome", "username : " + prefs.getString("username", "nopeeee"));
             Intent intent = new Intent(getApplicationContext(), MainActivity.class);
-            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            //intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
             startActivity(intent);
         }
     }
 
-    @Override
-    public void onBackPressed() {
-        gotoMain(null);
-    }
 }

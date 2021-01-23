@@ -6,12 +6,15 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
+import android.location.LocationManager;
 import android.net.NetworkInfo;
 import android.net.wifi.WifiManager;
 import android.net.wifi.p2p.WifiP2pInfo;
 import android.net.wifi.p2p.WifiP2pManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -28,7 +31,7 @@ public class Recieve extends AppCompatActivity {
     private IntentFilter intentFilter;
     private TextView message;
 
-
+    private LocationManager locationManager;
     private WifiBroadcastReciever wifiBroadcastReciever;
     private Button retry;
 
@@ -43,6 +46,7 @@ public class Recieve extends AppCompatActivity {
         wifiManager = (WifiManager) getApplicationContext().getSystemService(WIFI_SERVICE);
         wifiManager.setWifiEnabled(true);
         wifiP2pManager = (WifiP2pManager) getApplicationContext().getSystemService(WIFI_P2P_SERVICE);
+        locationManager=(LocationManager)getSystemService(Context.LOCATION_SERVICE);
         channel = wifiP2pManager.initialize(this, getMainLooper(), null);
 
         wifiP2pManager.removeGroup(channel, new WifiP2pManager.ActionListener() {
@@ -57,6 +61,9 @@ public class Recieve extends AppCompatActivity {
             }
         });
         intentFilter = new IntentFilter();
+        if(Build.VERSION.SDK_INT>=Build.VERSION_CODES.Q) {
+            intentFilter.addAction(LocationManager.MODE_CHANGED_ACTION);
+        }
         intentFilter.addAction(WifiP2pManager.WIFI_P2P_STATE_CHANGED_ACTION);
         intentFilter.addAction(WifiP2pManager.WIFI_P2P_CONNECTION_CHANGED_ACTION);
         intentFilter.addAction(WifiP2pManager.WIFI_P2P_THIS_DEVICE_CHANGED_ACTION);
@@ -64,8 +71,20 @@ public class Recieve extends AppCompatActivity {
         wifiBroadcastReciever = new WifiBroadcastReciever(wifiP2pManager, channel, this);
 
         registerReceiver(wifiBroadcastReciever, intentFilter);
+
+
+    }
+
+    public void discover(View view){
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 2);
+        }
+        if(!wifiManager.isWifiEnabled() ) {
+            message.setText("Promblem while turning on wifi please turn on wifi manually");
+            wifiManager.setWifiEnabled(true);
+            return;
+        }else if(Build.VERSION.SDK_INT >=Build.VERSION_CODES.Q && !locationManager.isLocationEnabled()){
+            message.setText("please on loction");
         }
         wifiP2pManager.discoverPeers(channel, new WifiP2pManager.ActionListener() {
 
@@ -79,7 +98,6 @@ public class Recieve extends AppCompatActivity {
                 message.setText("searching fails, Retry error code"+ reason);
             }
         });
-
     }
 
     @Override
@@ -139,6 +157,7 @@ public class Recieve extends AppCompatActivity {
                 } else {
                     Toast.makeText(context, "wifi is off", Toast.LENGTH_LONG).show();
                 }
+                activity.discover(null);
 
             } else if (WifiP2pManager.WIFI_P2P_CONNECTION_CHANGED_ACTION.equals(action)) {
                 if (wifiP2pManager == null) return;
@@ -147,11 +166,11 @@ public class Recieve extends AppCompatActivity {
                     activity.message.setText("connected");
                     wifiP2pManager.requestConnectionInfo(channel, activity.connectionInfoListener);
                 } else {
-                    activity.message.setText("Disconnected");
+                    //activity.message.setText("Disconnected");
                 }
 
-            } else if (WifiP2pManager.WIFI_P2P_THIS_DEVICE_CHANGED_ACTION.equals(action)) {
-
+            } else if (LocationManager.MODE_CHANGED_ACTION.equals(action)) {
+                activity.discover(null);
             }
         }
     }

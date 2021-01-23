@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
+import android.location.LocationManager;
 import android.net.NetworkInfo;
 import android.net.wifi.WifiManager;
 import android.net.wifi.p2p.WifiP2pConfig;
@@ -14,6 +15,7 @@ import android.net.wifi.p2p.WifiP2pDevice;
 import android.net.wifi.p2p.WifiP2pDeviceList;
 import android.net.wifi.p2p.WifiP2pInfo;
 import android.net.wifi.p2p.WifiP2pManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Message;
 import android.util.Log;
@@ -45,6 +47,7 @@ public class Connect extends AppCompatActivity {
     public TextView message;
     private ArrayAdapter<String> listAdapter;
     public ArrayList<String> deviceList = new ArrayList<>();
+    private LocationManager locationManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,6 +65,7 @@ public class Connect extends AppCompatActivity {
 
         wifiP2pManager = (WifiP2pManager) getSystemService(Context.WIFI_P2P_SERVICE);
         channel = wifiP2pManager.initialize(this, getMainLooper(), null);
+        locationManager=(LocationManager) getSystemService(Context.LOCATION_SERVICE);
         broadcastReceiver = new WifiDirectBroadcastReceiver(wifiP2pManager, channel, this);
         intentFilter = new IntentFilter();
 
@@ -77,6 +81,9 @@ public class Connect extends AppCompatActivity {
             }
         });
 
+        if(Build.VERSION.SDK_INT>=Build.VERSION_CODES.Q){
+            intentFilter.addAction(LocationManager.MODE_CHANGED_ACTION);
+        }
         intentFilter.addAction(WifiP2pManager.WIFI_P2P_STATE_CHANGED_ACTION);
         intentFilter.addAction(WifiP2pManager.WIFI_P2P_PEERS_CHANGED_ACTION);
         intentFilter.addAction(WifiP2pManager.WIFI_P2P_CONNECTION_CHANGED_ACTION);
@@ -85,13 +92,23 @@ public class Connect extends AppCompatActivity {
 
         registerReceiver(broadcastReceiver, intentFilter);
 
-        discover(null);
+        if(wifiManager.isP2pSupported()){
+            message.setText("your device is not supported p2p uninstall this app ");
+        }else{
+            discover(null);
+        }
     }
 
     public void discover(View view) {
-
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 2);
+        }
+        if(!wifiManager.isWifiEnabled() ) {
+            message.setText("Promblem while turning on wifi please turn on wifi manually ");
+            wifiManager.setWifiEnabled(true);
+            return;
+        }else if(Build.VERSION.SDK_INT >=Build.VERSION_CODES.Q && !locationManager.isLocationEnabled()){
+            message.setText("please on loction");
         }
         wifiP2pManager.discoverPeers(channel, new WifiP2pManager.ActionListener() {
 
@@ -248,11 +265,11 @@ public class Connect extends AppCompatActivity {
                     activity.message.setText("connected");
                     wifiP2pManager.requestConnectionInfo(channel, activity.connectionInfoListener);
                 } else {
-                    activity.message.setText("Disconnected");
+                    //activity.message.setText("Disconnected");
                 }
 
-            } else if (WifiP2pManager.WIFI_P2P_THIS_DEVICE_CHANGED_ACTION.equals(action)) {
-
+            } else if (LocationManager.MODE_CHANGED_ACTION.equals(action)) {
+                activity.discover(null);
             }
         }
     }

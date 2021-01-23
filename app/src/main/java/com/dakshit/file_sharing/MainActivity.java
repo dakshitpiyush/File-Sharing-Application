@@ -55,6 +55,7 @@ public class MainActivity extends AppCompatActivity {
             Log.v("start", "ya ya ya su swagatam");
             tt.setText("ya ya ya su swagatam");
             Intent intent = new Intent(getApplicationContext(), Landing.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK );
             startActivity(intent);
         }
         else{

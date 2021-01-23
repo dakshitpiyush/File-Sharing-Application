@@ -62,7 +62,7 @@ public class MainActivity extends AppCompatActivity {
             String uname = prefs.getString("username", "kahichnahi");
             Log.v("start", "uanem is:" + uname);
             tt.setText(uname);
-            imageView.setImageResource(prefs.getInt("profilePic", R.drawable.profile1));
+            imageView.setImageResource(prefs.getInt("profilePic", R.drawable.profile3));
         }
     }
 

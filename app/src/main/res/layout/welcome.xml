@@ -21,10 +21,11 @@
         android:layout_height="wrap_content"
         android:id="@+id/profilephotoscroll"
         tools:ignore="MissingConstraints"
+
         android:scrollbarStyle="outsideInset"
         android:paddingVertical="10dp"
         >
-        
+
     <RadioGroup
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -34,7 +35,7 @@
         app:layout_constraintTop_toTopOf="parent"
         tools:ignore="MissingConstraints"
         android:padding="2dp"
-
+        android:id="@+id/profiles"
         >
 
         <RadioButton
@@ -43,10 +44,10 @@
             android:layout_height="wrap_content"
             android:background="@drawable/profile1"
             android:button="@null"
-            android:checked="true"
+            android:checked="false"
             android:layout_marginStart="20dp"
             android:layout_marginEnd="20dp"
-            android:padding="2dp"
+            android:padding="20dp"
             />
 
         <RadioButton
@@ -55,7 +56,7 @@
             android:layout_height="wrap_content"
             android:background="@drawable/profile2"
             android:button="@null"
-            android:checked="true"
+            android:checked="false"
             android:layout_marginEnd="20dp"
             android:padding="2dp"
             />
@@ -137,7 +138,9 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:onClick="gotoMain"
-        android:text="Button"
+        android:text="Save"
+        android:fontFamily="@font/ubuntu_bold"
+        android:minWidth="150dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

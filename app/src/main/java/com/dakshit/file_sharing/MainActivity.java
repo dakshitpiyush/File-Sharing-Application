@@ -3,31 +3,31 @@ package com.dakshit.file_sharing;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
-import android.content.res.Resources;
-import android.location.LocationManager;
 import android.net.Uri;
-import android.net.wifi.WifiConfiguration;
-import android.net.wifi.WifiManager;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.PersistableBundle;
-import android.preference.PreferenceManager;
+import android.os.Environment;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.ImageButton;
+import android.view.ViewGroup;
+import android.widget.HorizontalScrollView;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatDialogFragment;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
-import androidx.fragment.app.Fragment;
+
+import java.io.File;
 import java.util.ArrayList;
 
 
@@ -35,6 +35,10 @@ public class MainActivity extends AppCompatActivity {
     private final int STORAGE_PERMISSION_CODE = 1;
     private TextView tt;
     private ImageView imageView;
+    private HorizontalScrollView locationscroll;
+    private AlertDialog.Builder builder;
+    private AlertDialog dialog;
+    @RequiresApi(api = Build.VERSION_CODES.R)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -45,10 +49,27 @@ public class MainActivity extends AppCompatActivity {
         requestPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE);
         requestPermission(Manifest.permission.ACCESS_FINE_LOCATION);
         requestPermission(Manifest.permission.CHANGE_WIFI_STATE);
+        requestPermission(Manifest.permission.MANAGE_EXTERNAL_STORAGE);
+        try {
+            String path = Environment.getExternalStorageDirectory().getAbsolutePath();
+            File rooter = new File(path + "/Mazfolder");
+            rooter.mkdir();
+            if(rooter.isDirectory()){
+                Log.v("start", "ata dir ahe ");
+            }
+            else{
+                Log.v("start", "ny zali create bhava");
+            }
+            Log.v("start", path);
+        }
+        catch (Exception e){
+            Log.v("start", "nay chalat ahe bhava");
+            e.printStackTrace();
+
+        }
         Log.v("start", "Activity is start");
         tt = (TextView) findViewById(R.id.textView);
         imageView=(ImageView)findViewById(R.id.profilePic);
-
         final SharedPreferences prefs = getApplicationContext().getSharedPreferences("my_preferences", Context.MODE_PRIVATE);
         boolean is_first_time = prefs.getBoolean("first_time", true);
         if(is_first_time){
@@ -143,5 +164,45 @@ public class MainActivity extends AppCompatActivity {
         super.onStop();
         Log.v("stop", "Activity is stoping");
     }
+
+    public void showLocation(View view){
+        if(builder == null){
+            builder = new AlertDialog.Builder(MainActivity.this);
+
+            final View customLayout
+                    = getLayoutInflater()
+                    .inflate(
+                            R.layout.display_location,
+                            null);
+            builder.setView(customLayout);
+            TextView tt = (TextView)customLayout.findViewById(R.id.files_location);
+            tt.setText(getApplicationContext().getExternalFilesDir(null).getPath());
+            builder.setPositiveButton("OK", new DialogInterface.OnClickListener(){
+
+                @Override
+                public void onClick(DialogInterface dialogInterface, int i) {
+                    dialogInterface.dismiss();
+
+                }
+            });
+            dialog = builder.create();
+        }
+
+
+        dialog.show();
+
+    }
+}
+
+class ShowLocation extends AppCompatDialogFragment{
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+
+
+    }
+
+
 }
 

@@ -115,6 +115,7 @@ public class Recieve extends AppCompatActivity {
     WifiP2pManager.ConnectionInfoListener connectionInfoListener = new WifiP2pManager.ConnectionInfoListener() {
         @Override
         public void onConnectionInfoAvailable(WifiP2pInfo info) {
+
             Intent sharing = new Intent(getApplicationContext(), Sharing.class);
             sharing.putExtra("wifiP2pInfo", info);
             startActivity(sharing);

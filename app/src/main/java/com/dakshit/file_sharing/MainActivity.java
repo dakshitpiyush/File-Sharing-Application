@@ -10,14 +10,12 @@ import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Environment;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.HorizontalScrollView;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
@@ -27,54 +25,33 @@ import androidx.appcompat.app.AppCompatDialogFragment;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
-import java.io.File;
 import java.util.ArrayList;
 
 
 public class MainActivity extends AppCompatActivity {
     private final int STORAGE_PERMISSION_CODE = 1;
-    private TextView tt;
+    private TextView tvUserName;
     private ImageView imageView;
     private HorizontalScrollView locationscroll;
     private AlertDialog.Builder builder;
     private AlertDialog dialog;
+    private String homeFolder;
     @RequiresApi(api = Build.VERSION_CODES.R)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-
-        requestPermission(Manifest.permission.READ_EXTERNAL_STORAGE);
-        requestPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE);
-        requestPermission(Manifest.permission.ACCESS_FINE_LOCATION);
-        requestPermission(Manifest.permission.CHANGE_WIFI_STATE);
-        requestPermission(Manifest.permission.MANAGE_EXTERNAL_STORAGE);
-        try {
-            String path = Environment.getExternalStorageDirectory().getAbsolutePath();
-            File rooter = new File(path + "/Mazfolder");
-            rooter.mkdir();
-            if(rooter.isDirectory()){
-                Log.v("start", "ata dir ahe ");
-            }
-            else{
-                Log.v("start", "ny zali create bhava");
-            }
-            Log.v("start", path);
-        }
-        catch (Exception e){
-            Log.v("start", "nay chalat ahe bhava");
-            e.printStackTrace();
-
-        }
         Log.v("start", "Activity is start");
-        tt = (TextView) findViewById(R.id.textView);
-        imageView=(ImageView)findViewById(R.id.profilePic);
+        tvUserName = findViewById(R.id.textView);
+        imageView= findViewById(R.id.profilePic);
+
         final SharedPreferences prefs = getApplicationContext().getSharedPreferences("my_preferences", Context.MODE_PRIVATE);
         boolean is_first_time = prefs.getBoolean("first_time", true);
+
         if(is_first_time){
             Log.v("start", "ya ya ya su swagatam");
-            tt.setText("ya ya ya su swagatam");
+            tvUserName.setText("ya ya ya su swagatam");
             Intent intent = new Intent(getApplicationContext(), Landing.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK );
             startActivity(intent);
@@ -83,8 +60,9 @@ public class MainActivity extends AppCompatActivity {
             Log.v("start", "khar bol tu pahile pn ala ahes na");
             String uname = prefs.getString("username", "kahichnahi");
             Log.v("start", "uanem is:" + uname);
-            tt.setText(uname);
+            tvUserName.setText(uname);
             imageView.setImageResource(prefs.getInt("profilePic", R.drawable.profile3));
+            homeFolder=prefs.getString("homeFolder", getApplicationContext().getExternalFilesDir(null).getPath());
         }
     }
 
@@ -92,9 +70,6 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-
-
-
     }
 
     public void sendReceiveFile(View view) {
@@ -117,6 +92,8 @@ public class MainActivity extends AppCompatActivity {
                 Intent receiveFileIntent = new Intent(this, Recieve.class);
                 startActivity(receiveFileIntent);
             }
+        }else{
+            Toast.makeText(getApplicationContext(), "you need to give permission of storage", Toast.LENGTH_LONG).show();
         }
     }
 
@@ -169,14 +146,10 @@ public class MainActivity extends AppCompatActivity {
         if(builder == null){
             builder = new AlertDialog.Builder(MainActivity.this);
 
-            final View customLayout
-                    = getLayoutInflater()
-                    .inflate(
-                            R.layout.display_location,
-                            null);
+            final View customLayout = getLayoutInflater().inflate( R.layout.display_location, null);
             builder.setView(customLayout);
-            TextView tt = (TextView)customLayout.findViewById(R.id.files_location);
-            tt.setText(getApplicationContext().getExternalFilesDir(null).getPath());
+            TextView tt = customLayout.findViewById(R.id.files_location);
+            tt.setText(homeFolder);
             builder.setPositiveButton("OK", new DialogInterface.OnClickListener(){
 
                 @Override

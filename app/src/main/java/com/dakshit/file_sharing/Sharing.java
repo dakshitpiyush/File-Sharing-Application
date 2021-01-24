@@ -2,6 +2,7 @@ package com.dakshit.file_sharing;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.net.wifi.p2p.WifiP2pInfo;
 import android.net.wifi.p2p.WifiP2pManager;
@@ -171,14 +172,14 @@ public class Sharing extends AppCompatActivity {
         DataInputStream dis=null;
         DataOutputStream dos = null;
         String parentFolder;
-        if(Build.VERSION.SDK_INT>=Build.VERSION_CODES.Q){
-//            parentFolder="/";
-            parentFolder = getApplicationContext().getExternalFilesDir(null).getPath();
-        }else{
-            parentFolder=Environment.getExternalStorageDirectory().getAbsolutePath() + "/fileSharing/";
-
+        final SharedPreferences prefs = getApplicationContext().getSharedPreferences("my_preferences", Context.MODE_PRIVATE);
+        parentFolder=prefs.getString("homeFolder", getApplicationContext().getExternalFilesDir(null).getPath());
+        if(Build.VERSION.SDK_INT<Build.VERSION_CODES.Q){
+            File file=new File(parentFolder);
+            if(!file.exists()){
+                file.mkdir();
+            }
         }
-
 
         try{
             inputStream = socket.getInputStream();

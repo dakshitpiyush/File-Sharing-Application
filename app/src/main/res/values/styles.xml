@@ -1,11 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+
     <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
-        <item name="android:fontFamily">@font/ubuntu_regular</item> <!-- target android sdk versions < 26 and > 14 if theme other than AppCompat -->
+        <item name="android:fontFamily">@font/ubuntu_regular
+        </item> <!-- target android sdk versions < 26 and > 14 if theme other than AppCompat -->
     </style>
-<!--    <shape-->
-<!--        xmlns:android="http://schemas.android.com/apk/res/android"-->
-<!--        android:shape="circle">-->
-<!--        <stroke android:width="10px" android:color="#000000" />-->
-<!--    </shape>-->
+
+    <style name="Widget.Theme.FileSharing.MyView" parent="">
+        <item name="android:background">@color/gray_400</item>
+        <item name="exampleColor">@color/light_blue_400</item>
+    </style>
+    <!--    <shape-->
+    <!--        xmlns:android="http://schemas.android.com/apk/res/android"-->
+    <!--        android:shape="circle">-->
+    <!--        <stroke android:width="10px" android:color="#000000" />-->
+    <!--    </shape>-->
 </resources>

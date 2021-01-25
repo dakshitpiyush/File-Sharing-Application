@@ -9,6 +9,7 @@ import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.location.LocationManager;
 import android.net.NetworkInfo;
+import android.net.Uri;
 import android.net.wifi.WifiManager;
 import android.net.wifi.p2p.WifiP2pConfig;
 import android.net.wifi.p2p.WifiP2pDevice;
@@ -49,55 +50,29 @@ public class Connect extends AppCompatActivity {
     public ArrayList<String> deviceList = new ArrayList<>();
     private LocationManager locationManager;
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_connect);
-
-        peerList = (ListView) findViewById(R.id.listPeers);
-        retry = (Button) findViewById(R.id.btnRetry);
-        message = (TextView) findViewById(R.id.tvMessage);
-
-        wifiManager = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
-        wifiManager.setWifiEnabled(true);
-
-
-
-        wifiP2pManager = (WifiP2pManager) getSystemService(Context.WIFI_P2P_SERVICE);
-        channel = wifiP2pManager.initialize(this, getMainLooper(), null);
-        locationManager=(LocationManager) getSystemService(Context.LOCATION_SERVICE);
-        broadcastReceiver = new WifiDirectBroadcastReceiver(wifiP2pManager, channel, this);
-        intentFilter = new IntentFilter();
-
-        wifiP2pManager.removeGroup(channel, new WifiP2pManager.ActionListener() {
-            @Override
-            public void onSuccess() {
-
+    public WifiP2pManager.ConnectionInfoListener connectionInfoListener = new WifiP2pManager.ConnectionInfoListener() {
+        @Override
+        public void onConnectionInfoAvailable(WifiP2pInfo info) {
+            Intent parentIntent = getIntent(), sharing = new Intent(getApplicationContext(), Sharing.class);
+            ArrayList<String> selectedFileList = new ArrayList<>();
+            if(parentIntent.getAction().equals(Intent.ACTION_SEND)){
+                Uri fileUri=(Uri) parentIntent.getParcelableExtra(Intent.EXTRA_STREAM);
+                selectedFileList.add(FileUtils.getPath(getApplicationContext(), fileUri));
+            }else if(parentIntent.getAction().equals(Intent.ACTION_SEND_MULTIPLE)){
+                ArrayList<Uri> fileUris = parentIntent.getParcelableArrayListExtra(Intent.EXTRA_STREAM);
+                if (fileUris != null) {
+                    for(Uri fileUri:fileUris){
+                        if(fileUri != null) selectedFileList.add(FileUtils.getPath(getApplicationContext(), fileUri));
+                    }
+                }
+            }else if (parentIntent.hasExtra("fileList")){
+                    selectedFileList = parentIntent.getStringArrayListExtra("fileList");
             }
-
-            @Override
-            public void onFailure(int reason) {
-
-            }
-        });
-
-        if(Build.VERSION.SDK_INT>=Build.VERSION_CODES.Q){
-            intentFilter.addAction(LocationManager.MODE_CHANGED_ACTION);
+            sharing.putExtra("selectedFileList", selectedFileList);
+            sharing.putExtra("wifiP2pInfo", info);
+            startActivity(sharing);
         }
-        intentFilter.addAction(WifiP2pManager.WIFI_P2P_STATE_CHANGED_ACTION);
-        intentFilter.addAction(WifiP2pManager.WIFI_P2P_PEERS_CHANGED_ACTION);
-        intentFilter.addAction(WifiP2pManager.WIFI_P2P_CONNECTION_CHANGED_ACTION);
-        intentFilter.addAction(WifiP2pManager.WIFI_P2P_THIS_DEVICE_CHANGED_ACTION);
-
-
-        registerReceiver(broadcastReceiver, intentFilter);
-
-        if(wifiManager.isP2pSupported()){
-            message.setText("your device is not supported p2p uninstall this app ");
-        }else{
-            discover(null);
-        }
-    }
+    };
 
     public void discover(View view) {
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
@@ -167,36 +142,53 @@ public class Connect extends AppCompatActivity {
         }
     };
 
-    public Handler handler = new Handler(new Handler.Callback() {
-        @Override
-        public boolean handleMessage(@NonNull Message msg) {
-            String fileName;
-            switch (msg.what) {
-                case 1:
-                    fileName = (String) msg.obj;
-                    message.setText("sneding fails of file" + fileName);
-                    break;
-                case 2:
-                    fileName = (String) msg.obj;
-                    message.setText("sneding sucsess file" + fileName);
-                    break;
-            }
-            return true;
-        }
-    });
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_connect);
 
-    public WifiP2pManager.ConnectionInfoListener connectionInfoListener = new WifiP2pManager.ConnectionInfoListener() {
-        @Override
-        public void onConnectionInfoAvailable(WifiP2pInfo info) {
-            Intent parentIntent = getIntent(), sharing = new Intent(getApplicationContext(), Sharing.class);
-            ArrayList<String> selectedFileList = null;
-            if (parentIntent.hasExtra("fileList"))
-                selectedFileList = parentIntent.getStringArrayListExtra("fileList");
-            sharing.putExtra("selectedFileList", selectedFileList);
-            sharing.putExtra("wifiP2pInfo", info);
-            startActivity(sharing);
+        peerList = (ListView) findViewById(R.id.listPeers);
+        retry = (Button) findViewById(R.id.btnRetry);
+        message = (TextView) findViewById(R.id.tvMessage);
+
+        wifiManager = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
+        wifiManager.setWifiEnabled(true);
+
+        wifiP2pManager = (WifiP2pManager) getSystemService(Context.WIFI_P2P_SERVICE);
+        channel = wifiP2pManager.initialize(this, getMainLooper(), null);
+        locationManager=(LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        broadcastReceiver = new WifiDirectBroadcastReceiver(wifiP2pManager, channel, this);
+        intentFilter = new IntentFilter();
+
+        wifiP2pManager.removeGroup(channel, new WifiP2pManager.ActionListener() {
+            @Override
+            public void onSuccess() {
+
+            }
+
+            @Override
+            public void onFailure(int reason) {
+
+            }
+        });
+
+        if(Build.VERSION.SDK_INT>=Build.VERSION_CODES.Q){
+            intentFilter.addAction(LocationManager.MODE_CHANGED_ACTION);
         }
-    };
+        intentFilter.addAction(WifiP2pManager.WIFI_P2P_STATE_CHANGED_ACTION);
+        intentFilter.addAction(WifiP2pManager.WIFI_P2P_PEERS_CHANGED_ACTION);
+        intentFilter.addAction(WifiP2pManager.WIFI_P2P_CONNECTION_CHANGED_ACTION);
+        intentFilter.addAction(WifiP2pManager.WIFI_P2P_THIS_DEVICE_CHANGED_ACTION);
+
+
+        registerReceiver(broadcastReceiver, intentFilter);
+
+        if(!wifiManager.isP2pSupported()){
+            message.setText("your device is not supported p2p uninstall this app ");
+        }else{
+            discover(null);
+        }
+    }
 
     @Override
     protected void onResume() {
@@ -225,6 +217,7 @@ public class Connect extends AppCompatActivity {
         });
         Log.v("destroy", "activity destroye");
     }
+
     @Override
     protected void onStop() {
         super.onStop();
@@ -248,10 +241,11 @@ public class Connect extends AppCompatActivity {
             if (WifiP2pManager.WIFI_P2P_STATE_CHANGED_ACTION.equals(action)) {
                 if (intent.getIntExtra(WifiP2pManager.EXTRA_WIFI_STATE, -1) == WifiP2pManager.WIFI_P2P_STATE_ENABLED) {
                     Toast.makeText(context, "wifi is on", Toast.LENGTH_LONG).show();
-                    activity.discover(null);
+
                 } else {
                     Toast.makeText(context, "wifi is off", Toast.LENGTH_LONG).show();
                 }
+                activity.discover(null);
 
             } else if (WifiP2pManager.WIFI_P2P_PEERS_CHANGED_ACTION.equals(action)) {
                 if (ActivityCompat.checkSelfPermission(activity, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {

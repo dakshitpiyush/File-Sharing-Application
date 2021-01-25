@@ -71,6 +71,11 @@ public class Recieve extends AppCompatActivity {
         wifiBroadcastReciever = new WifiBroadcastReciever(wifiP2pManager, channel, this);
 
         registerReceiver(wifiBroadcastReciever, intentFilter);
+        if(!wifiManager.isP2pSupported()){
+            message.setText("your device is not supported p2p uninstall this app ");
+        }else{
+            discover(null);
+        }
 
 
     }

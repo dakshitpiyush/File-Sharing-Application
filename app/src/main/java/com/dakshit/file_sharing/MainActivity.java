@@ -10,6 +10,8 @@ import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
+import android.provider.DocumentsContract;
 import android.util.Log;
 import android.view.View;
 import android.widget.HorizontalScrollView;
@@ -25,6 +27,7 @@ import androidx.appcompat.app.AppCompatDialogFragment;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
+import java.io.File;
 import java.util.ArrayList;
 
 
@@ -163,8 +166,23 @@ public class MainActivity extends AppCompatActivity {
 
 
         dialog.show();
+//        File pdfFile = new File(homeFolder);//File path
+//        if (pdfFile.exists()) //Checking if the file exists or not
+//        {
+//            Uri path = Uri.fromFile(pdfFile);
+//            Intent objIntent = new Intent(Intent.ACTION_VIEW);
+//            //objIntent.addCategory(Intent.CATEGORY_OPENABLE);
+//            objIntent.setDataAndType(path, DocumentsContract.Document.MIME_TYPE_DIR);
+//            //objIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+//            startActivity(objIntent);//Starting the pdf viewer
+//        } else {
+//
+//            Toast.makeText(getApplicationContext(), "The file not exists! ", Toast.LENGTH_SHORT).show();
+//
+//        }
 
     }
+
 }
 
 class ShowLocation extends AppCompatDialogFragment{

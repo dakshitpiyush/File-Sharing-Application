@@ -29,8 +29,21 @@
         
         <activity android:name=".Sharing"></activity>
 
-        <activity android:name=".Recieve" />
-        <activity android:name=".Connect" />
+        <activity android:name=".Recieve" >
+
+        </activity>
+        <activity android:name=".Connect" >
+            <intent-filter>
+                <action android:name="android.intent.action.SEND" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="*/*" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.SEND_MULTIPLE" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="*/*" />
+            </intent-filter>
+        </activity>
         <activity android:name=".Landing" />
         <activity android:name=".MainActivity">
             <intent-filter>
@@ -40,6 +53,7 @@
             </intent-filter>
         </activity>
         <activity android:name=".ShowFiles" />
+
     </application>
 
 </manifest>

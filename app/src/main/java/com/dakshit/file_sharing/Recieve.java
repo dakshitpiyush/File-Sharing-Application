@@ -5,6 +5,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.LocationManager;
 import android.net.NetworkInfo;
@@ -22,6 +23,8 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
+
+import java.lang.reflect.Method;
 
 public class Recieve extends AppCompatActivity {
 
@@ -74,6 +77,7 @@ public class Recieve extends AppCompatActivity {
         if(!wifiManager.isP2pSupported()){
             message.setText("your device is not supported p2p uninstall this app ");
         }else{
+            changeDeviceName();
             discover(null);
         }
 
@@ -103,6 +107,33 @@ public class Recieve extends AppCompatActivity {
                 message.setText("searching fails, Retry error code"+ reason);
             }
         });
+    }
+
+    public void changeDeviceName() {
+        final SharedPreferences prefs = getApplicationContext().getSharedPreferences("my_preferences", Context.MODE_PRIVATE);
+        String username=prefs.getString("username", "kahichnahi");
+        int profilePic=prefs.getInt("profilePic", R.drawable.profile3);
+        String deviceNewName="receiver"+":"+username+":"+ profilePic;
+        try {
+            Method method = wifiP2pManager.getClass().getMethod("setDeviceName", WifiP2pManager.Channel.class, String.class, WifiP2pManager.ActionListener.class);
+
+            method.invoke(wifiP2pManager, channel, deviceNewName, new WifiP2pManager.ActionListener() {
+
+                @Override
+                public void onSuccess() {
+                    Log.v("namechange", "name change sucsessfully");
+                }
+
+                @Override
+                public void onFailure(int reason) {
+
+                    Log.d("namefail", "Name change failed: " + reason);
+                }
+            });
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     @Override

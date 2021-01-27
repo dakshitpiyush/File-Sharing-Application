@@ -79,6 +79,7 @@ public class Sharing extends AppCompatActivity {
     public static final int FILE_SENT=3;
     public static final int DATA_PART_SENT=5;
     public static final int DATA_PART_RECEIVED=4;
+    public static final int PARTNER_OFFLINE=6;
     public static final int PORT_NO=8069;
     public static final int BUFFER_SIZE=4096;
     private WifiP2pManager wifiP2pManager;
@@ -145,7 +146,7 @@ public class Sharing extends AppCompatActivity {
                     case DATA_PART_SENT:
                         makeProgress(true, BUFFER_SIZE, msg.arg1);
                         break;
-                    case 6:
+                    case PARTNER_OFFLINE:
                         Toast.makeText(getApplicationContext(), "tuza sender palala", Toast.LENGTH_LONG).show();
                         Intent intent = new Intent(getApplicationContext(), MainActivity.class);
                         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);

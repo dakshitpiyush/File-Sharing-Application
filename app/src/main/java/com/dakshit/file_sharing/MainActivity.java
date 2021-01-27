@@ -35,7 +35,6 @@ public class MainActivity extends AppCompatActivity {
     private final int STORAGE_PERMISSION_CODE = 1;
     private TextView tvUserName;
     private ImageView imageView;
-    private HorizontalScrollView locationscroll;
     private AlertDialog.Builder builder;
     private AlertDialog dialog;
     private String homeFolder;

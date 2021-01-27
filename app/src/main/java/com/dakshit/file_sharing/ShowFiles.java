@@ -26,10 +26,10 @@ public class ShowFiles extends ListActivity {
     private TextView directoryPath;
     protected MyListAdapter listOfFileAdapter;
     private File root;
-    private ArrayList<File> listOfFiles = new ArrayList();
-    private HashSet<String> selectedFilesSet = new HashSet<>();
+    private final ArrayList<File> listOfFiles = new ArrayList();
+    private final HashSet<String> selectedFilesSet = new HashSet<>();
     private TextView fileCountView;
-    private ArrayList<String> filenames = new ArrayList<>();
+    private final ArrayList<String> filenames = new ArrayList<>();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -70,8 +70,7 @@ public class ShowFiles extends ListActivity {
             refreshList();
         } else {
             CheckBox checkBox = view.findViewById(R.id.checkBox);
-            if (selectedFilesSet.add(selectedFile.getAbsolutePath())) checkBox.setChecked(true);
-            else checkBox.setChecked(false);
+            checkBox.setChecked(selectedFilesSet.add(selectedFile.getAbsolutePath()));
 
         }
         super.onListItemClick(fileListView, view, position, id);
@@ -147,11 +146,11 @@ public class ShowFiles extends ListActivity {
         @Override
         public View getView(int position, View view, ViewGroup parent) {
             LayoutInflater inflater = context.getLayoutInflater();
-            View rowView = inflater.inflate(R.layout.iconlist, null, true);
-            TextView titleText = (TextView) rowView.findViewById(R.id.title);
-            ImageView imageView = (ImageView) rowView.findViewById(R.id.icon);
-            TextView subtitleText = (TextView) rowView.findViewById(R.id.subtitle);
-            CheckBox checkBox = (CheckBox) rowView.findViewById(R.id.checkBox);
+            View rowView = inflater.inflate(R.layout.iconlist, null,  true);
+            TextView titleText = rowView.findViewById(R.id.title);
+            ImageView imageView = rowView.findViewById(R.id.icon);
+            TextView subtitleText = rowView.findViewById(R.id.subtitle);
+            CheckBox checkBox = rowView.findViewById(R.id.checkBox);
 
             titleText.setText(filenames.get(position));
             if (maintitle.get(position).isDirectory()) {
@@ -191,7 +190,7 @@ public class ShowFiles extends ListActivity {
         private String getSize(File file) {
             double length = (double) file.length();
             if (length < 1024) {
-                return String.valueOf(length) + " B";
+                return length + " B";
             } else if (length / 1024 < 1024) {
                 return String.format("%.1f", length / 1024) + " KB";
             } else if (length / (1024 * 1024) < 1024) {

@@ -112,8 +112,9 @@ public class Recieve extends AppCompatActivity {
     public void changeDeviceName() {
         final SharedPreferences prefs = getApplicationContext().getSharedPreferences("my_preferences", Context.MODE_PRIVATE);
         String username=prefs.getString("username", "kahichnahi");
-        int profilePic=prefs.getInt("profilePic", R.drawable.profile3);
+        int profilePic=prefs.getInt("profilePic", 3);
         String deviceNewName="receiver"+":"+username+":"+ profilePic;
+
         try {
             Method method = wifiP2pManager.getClass().getMethod("setDeviceName", WifiP2pManager.Channel.class, String.class, WifiP2pManager.ActionListener.class);
 
@@ -121,7 +122,7 @@ public class Recieve extends AppCompatActivity {
 
                 @Override
                 public void onSuccess() {
-                    Log.v("namechange", "name change sucsessfully");
+                    Log.v("namechange", "name change sucsessfully"+deviceNewName);
                 }
 
                 @Override

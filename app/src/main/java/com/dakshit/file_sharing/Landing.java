@@ -27,15 +27,15 @@ public class Landing extends AppCompatActivity {
     TextView name;
     private RadioButton radio_button;
     private final HashMap<Integer, Integer> proToImg=new HashMap(){{
-        put(R.id.profile1, R.drawable.profile1);
-        put(R.id.profile2, R.drawable.profile2);
-        put(R.id.profile3, R.drawable.profile3);
-        put(R.id.profile4, R.drawable.profile4);
-        put(R.id.profile5, R.drawable.profile5);
-        put(R.id.profile6, R.drawable.profile6);
-        put(R.id.profile7, R.drawable.profile7);
-        put(R.id.profile8, R.drawable.profile8);
-        put(R.id.profile9, R.drawable.profile9);
+        put(R.id.profile1, 0);
+        put(R.id.profile2, 1);
+        put(R.id.profile3, 2);
+        put(R.id.profile4, 3);
+        put(R.id.profile5, 4);
+        put(R.id.profile6, 5);
+        put(R.id.profile7, 6);
+        put(R.id.profile8, 7);
+        put(R.id.profile9, 8);
     }};
     private RadioGroup profile_group;
 

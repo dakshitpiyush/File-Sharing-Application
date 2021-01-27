@@ -29,6 +29,7 @@ import androidx.core.content.ContextCompat;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -38,6 +39,17 @@ public class MainActivity extends AppCompatActivity {
     private AlertDialog.Builder builder;
     private AlertDialog dialog;
     private String homeFolder;
+    private static final int[] IND_TO_RES= new int[]{
+            R.drawable.profile1,
+        R.drawable.profile2,
+        R.drawable.profile3,
+        R.drawable.profile4,
+        R.drawable.profile5,
+        R.drawable.profile6,
+        R.drawable.profile7,
+        R.drawable.profile8,
+        R.drawable.profile9
+    };
     @RequiresApi(api = Build.VERSION_CODES.R)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,7 +75,7 @@ public class MainActivity extends AppCompatActivity {
             String uname = prefs.getString("username", "kahichnahi");
             Log.v("start", "uanem is:" + uname);
             tvUserName.setText(uname);
-            imageView.setImageResource(prefs.getInt("profilePic", R.drawable.profile3));
+            imageView.setImageResource(IND_TO_RES[prefs.getInt("profilePic", 3)]);
             homeFolder=prefs.getString("homeFolder", getApplicationContext().getExternalFilesDir(null).getPath());
         }
     }

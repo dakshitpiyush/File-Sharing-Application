@@ -44,30 +44,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Vector;
 
-class Profile extends ArrayAdapter{
-    private ArrayList<Integer> photos;
-    private ArrayList<String> usernames;
-    private Activity activity;
-    public Profile(Activity activity, ArrayList<String> unames, ArrayList<Integer> photos){
-        super(activity, R.layout.devices);
-        this.photos = photos;
-        this.usernames = unames;
-        this.activity = activity;
-    }
 
-    @NonNull
-    @Override
-    public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
-        LayoutInflater li = activity.getLayoutInflater();
-        View view = li.inflate(R.layout.devices, null);
-        ImageView photo = (ImageView) view.findViewById(R.id.uphoto);
-        TextView uname = (TextView) view.findViewById(R.id.uname);
-
-        photo.setImageResource(photos.get(position));
-        uname.setText(usernames.get(position));
-        return view;
-    }
-}
 public class Connect extends AppCompatActivity {
     private WifiP2pManager wifiP2pManager;
     private WifiP2pManager.Channel channel;
@@ -80,14 +57,25 @@ public class Connect extends AppCompatActivity {
     private Profile listAdapter;
     public ArrayList<String> deviceList = new ArrayList<>();
     private LocationManager locationManager;
-
-
+    private static final int[] IND_TO_RES= new int[]{
+            R.drawable.profile1,
+            R.drawable.profile2,
+            R.drawable.profile3,
+            R.drawable.profile4,
+            R.drawable.profile5,
+            R.drawable.profile6,
+            R.drawable.profile7,
+            R.drawable.profile8,
+            R.drawable.profile9
+    };
     public WifiP2pManager.ConnectionInfoListener connectionInfoListener = new WifiP2pManager.ConnectionInfoListener() {
         @Override
         public void onConnectionInfoAvailable(WifiP2pInfo info) {
             Intent parentIntent = getIntent(), sharing = new Intent(getApplicationContext(), Sharing.class);
             ArrayList<String> selectedFileList = new ArrayList<>();
-            if (parentIntent.getAction().equals(Intent.ACTION_SEND)) {
+            if (parentIntent.getAction()==null && parentIntent.hasExtra("fileList")) {
+                selectedFileList = parentIntent.getStringArrayListExtra("fileList");
+            } else if (parentIntent.getAction().equals(Intent.ACTION_SEND)) {
                 Uri fileUri = parentIntent.getParcelableExtra(Intent.EXTRA_STREAM);
                 selectedFileList.add(FileUtils.getPath(getApplicationContext(), fileUri));
             } else if (parentIntent.getAction().equals(Intent.ACTION_SEND_MULTIPLE)) {
@@ -98,38 +86,35 @@ public class Connect extends AppCompatActivity {
                             selectedFileList.add(FileUtils.getPath(getApplicationContext(), fileUri));
                     }
                 }
-            } else if (parentIntent.hasExtra("fileList")) {
-                selectedFileList = parentIntent.getStringArrayListExtra("fileList");
             }
             sharing.putExtra("selectedFileList", selectedFileList);
             sharing.putExtra("wifiP2pInfo", info);
             startActivity(sharing);
         }
     };
+    ArrayList<String> deviceNameList = new ArrayList<>();
+    ArrayList<Integer> uphotos =  new ArrayList<>();
     public WifiP2pManager.PeerListListener peerListListener = new WifiP2pManager.PeerListListener() {
         @Override
         public void onPeersAvailable(WifiP2pDeviceList peers) {
-            ArrayList<String> deviceNameList = new ArrayList<>();
-            ArrayList<Integer> uphotos =  new ArrayList<>();
+            deviceNameList.clear();
+            uphotos.clear();
             for (WifiP2pDevice device : peers.getDeviceList()) {
                 String deviceName=device.deviceName;
                 Log.v("device found",deviceName);
                 String[] userDetail=deviceName.split(":");
                 if(userDetail.length!=3 || !userDetail[0].equals("receiver")) continue;
-                int profilePicRes=R.drawable.profile3;
+                int profilePicRes=3;
                 try {
-                    profilePicRes = Integer.getInteger(userDetail[2], 10);
+                    profilePicRes = Integer.parseInt(userDetail[2]);
                 }catch (NumberFormatException n){
-
+                    Log.d("err", "error occured");
                 }
                 deviceNameList.add(userDetail[1]);
-                uphotos.add(profilePicRes);
+                uphotos.add(IND_TO_RES[profilePicRes]);
                 deviceList.add(device.deviceAddress);
             }
-
-            listAdapter = new Profile(Connect.this, deviceNameList, uphotos);
-            peerList.setAdapter(listAdapter);
-
+            listAdapter.notifyDataSetChanged();
         }
     };
 
@@ -188,7 +173,7 @@ public class Connect extends AppCompatActivity {
     public void changeDeviceName() {
         final SharedPreferences prefs = getApplicationContext().getSharedPreferences("my_preferences", Context.MODE_PRIVATE);
         String username=prefs.getString("username", "kahichnahi");
-        int profilePic=prefs.getInt("profilePic", R.drawable.profile3);
+        int profilePic=prefs.getInt("profilePic", 3);
         String deviceNewName="sender"+":"+username+":"+ profilePic;
         try {
             Method method = wifiP2pManager.getClass().getMethod("setDeviceName", WifiP2pManager.Channel.class, String.class, WifiP2pManager.ActionListener.class);
@@ -255,6 +240,8 @@ public class Connect extends AppCompatActivity {
 
 
         registerReceiver(broadcastReceiver, intentFilter);
+        listAdapter = new Profile(Connect.this, deviceNameList, uphotos);
+        peerList.setAdapter(listAdapter);
 
         if(!wifiManager.isP2pSupported()){
             message.setText("your device is not supported p2p uninstall this app ");
@@ -262,6 +249,7 @@ public class Connect extends AppCompatActivity {
             changeDeviceName();
             discover(null);
         }
+
     }
 
     @Override
@@ -339,6 +327,29 @@ public class Connect extends AppCompatActivity {
             } else if (LocationManager.MODE_CHANGED_ACTION.equals(action)) {
                 activity.discover(null);
             }
+        }
+    }
+    private class Profile extends ArrayAdapter<String>{
+        private final ArrayList<Integer> photos;
+        private final ArrayList<String> usernames;
+        private final Activity activity;
+        public Profile(Activity activity, ArrayList<String> unames, ArrayList<Integer> photos){
+            super(activity, R.layout.devices, unames);
+            this.photos = photos;
+            this.usernames = unames;
+            this.activity = activity;
+        }
+
+        @Override
+        public View getView(int position, View view, ViewGroup parent) {
+            LayoutInflater li = activity.getLayoutInflater();
+            View rowView = li.inflate(R.layout.devices, null);
+            ImageView photo = rowView.findViewById(R.id.uphoto);
+            TextView uname = rowView.findViewById(R.id.uname);
+
+            photo.setImageResource(photos.get(position));
+            uname.setText(usernames.get(position));
+            return rowView;
         }
     }
 

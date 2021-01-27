@@ -7,38 +7,39 @@
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
-    <Button
-        android:id="@+id/btnSend"
-        android:layout_width="150dp"
-        android:layout_height="wrap_content"
-        android:onClick="sendReceiveFile"
-        android:padding="10dp"
-        android:text="Send"
-        android:textSize="20dp"
-        app:cornerRadius="20dp"
+<!--    <Button-->
+<!--        android:id="@+id/btnSend"-->
+<!--        android:layout_width="150dp"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:onClick="sendReceiveFile"-->
+<!--        android:padding="10dp"-->
+<!--        android:text="Send"-->
+<!--        android:textSize="20dp"-->
+<!--        app:cornerRadius="20dp"-->
 
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.501"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.477" />
+<!--        app:layout_constraintBottom_toBottomOf="parent"-->
+<!--        app:layout_constraintEnd_toEndOf="parent"-->
+<!--        app:layout_constraintHorizontal_bias="0.501"-->
+<!--        app:layout_constraintStart_toStartOf="parent"-->
+<!--        app:layout_constraintTop_toTopOf="parent"-->
+<!--        app:layout_constraintVertical_bias="0.477" />-->
 
-    <Button
-        android:id="@+id/btnRecive"
-        android:layout_width="150dp"
-        android:layout_height="wrap_content"
-        android:onClick="sendReceiveFile"
-        android:padding="10dp"
-        android:text="Recieve"
-        android:textSize="20dp"
-        app:cornerRadius="20dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.501"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/btnSend"
-        app:layout_constraintVertical_bias="0.402" />
+<!--    <Button-->
+<!--        android:id="@+id/btnRecive"-->
+<!--        android:layout_width="150dp"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:onClick="sendReceiveFile"-->
+<!--        android:padding="10dp"-->
+<!--        android:text="Recieve"-->
+<!--        android:textSize="20dp"-->
+<!--        app:cornerRadius="20dp"-->
+<!--        app:layout_constraintBottom_toBottomOf="parent"-->
+<!--        app:layout_constraintEnd_toEndOf="parent"-->
+<!--        app:layout_constraintHorizontal_bias="0.501"-->
+<!--        app:layout_constraintStart_toStartOf="parent"-->
+<!--        app:layout_constraintTop_toBottomOf="@+id/btnSend"-->
+<!--        app:layout_constraintVertical_bias="0.402" />-->
+
 
     <TextView
         android:id="@+id/textView"
@@ -51,14 +52,15 @@
         app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/profilePic"
-        app:layout_constraintVertical_bias="0.305" />
+        app:layout_constraintVertical_bias="0.113" />
 
     <ImageView
         android:id="@+id/profilePic"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="80dp"
+        android:layout_marginTop="40dp"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         tools:srcCompat="@drawable/profile1" />
@@ -75,7 +77,56 @@
         tools:ignore="MissingConstraints"
         android:onClick="showLocation"/>
 
+    <ImageView
+        android:id="@+id/btnSend"
+        android:layout_width="120dp"
+        android:layout_height="120dp"
+        android:onClick="sendReceiveFile"
+        android:padding="10dp"
+        app:layout_constraintBottom_toBottomOf="parent"
 
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.498"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.433"
+        app:srcCompat="@drawable/sender"
+        tools:ignore="MissingConstraints" />
+
+    <ImageView
+        android:id="@+id/btnRecive"
+        android:layout_width="120sp"
+        android:layout_height="120sp"
+        android:onClick="sendReceiveFile"
+        android:padding="10dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/btnSend"
+        app:layout_constraintVertical_bias="0.264"
+        app:srcCompat="@drawable/recieve"
+        tools:ignore="MissingConstraints" />
+
+    <TextView
+        android:id="@+id/textView2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="SEND"
+        android:textColor="@color/purple_500"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/btnSend" />
+
+    <TextView
+        android:id="@+id/textView3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="RECEIVE"
+        android:textColor="@color/purple_500"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/btnRecive" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

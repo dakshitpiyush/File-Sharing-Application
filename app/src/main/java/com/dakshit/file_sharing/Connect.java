@@ -21,10 +21,13 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Message;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -41,6 +44,30 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Vector;
 
+class Profile extends ArrayAdapter{
+    private ArrayList<Integer> photos;
+    private ArrayList<String> usernames;
+    private Activity activity;
+    public Profile(Activity activity, ArrayList<String> unames, ArrayList<Integer> photos){
+        super(activity, R.layout.devices);
+        this.photos = photos;
+        this.usernames = unames;
+        this.activity = activity;
+    }
+
+    @NonNull
+    @Override
+    public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
+        LayoutInflater li = activity.getLayoutInflater();
+        View view = li.inflate(R.layout.devices, null);
+        ImageView photo = (ImageView) view.findViewById(R.id.uphoto);
+        TextView uname = (TextView) view.findViewById(R.id.uname);
+
+        photo.setImageResource(photos.get(position));
+        uname.setText(usernames.get(position));
+        return view;
+    }
+}
 public class Connect extends AppCompatActivity {
     private WifiP2pManager wifiP2pManager;
     private WifiP2pManager.Channel channel;
@@ -50,9 +77,10 @@ public class Connect extends AppCompatActivity {
     private ListView peerList;
     private Button retry;
     public TextView message;
-    private ArrayAdapter<String> listAdapter;
+    private Profile listAdapter;
     public ArrayList<String> deviceList = new ArrayList<>();
     private LocationManager locationManager;
+
 
     public WifiP2pManager.ConnectionInfoListener connectionInfoListener = new WifiP2pManager.ConnectionInfoListener() {
         @Override
@@ -81,7 +109,8 @@ public class Connect extends AppCompatActivity {
     public WifiP2pManager.PeerListListener peerListListener = new WifiP2pManager.PeerListListener() {
         @Override
         public void onPeersAvailable(WifiP2pDeviceList peers) {
-            List<String> deviceNameList = new ArrayList();
+            ArrayList<String> deviceNameList = new ArrayList<>();
+            ArrayList<Integer> uphotos =  new ArrayList<>();
             for (WifiP2pDevice device : peers.getDeviceList()) {
                 String deviceName=device.deviceName;
                 Log.v("device found",deviceName);
@@ -94,10 +123,11 @@ public class Connect extends AppCompatActivity {
 
                 }
                 deviceNameList.add(userDetail[1]);
+                uphotos.add(profilePicRes);
                 deviceList.add(device.deviceAddress);
             }
 
-            listAdapter = new ArrayAdapter(getApplicationContext(), android.R.layout.simple_list_item_1, deviceNameList);
+            listAdapter = new Profile(Connect.this, deviceNameList, uphotos);
             peerList.setAdapter(listAdapter);
 
         }

@@ -113,7 +113,7 @@ public class Recieve extends AppCompatActivity {
         final SharedPreferences prefs = getApplicationContext().getSharedPreferences("my_preferences", Context.MODE_PRIVATE);
         String username=prefs.getString("username", "kahichnahi");
         int profilePic=prefs.getInt("profilePic", 3);
-        String deviceNewName="receiver"+":"+username+":"+ profilePic;
+        String deviceNewName="receiver"+":"+username+":"+ profilePic+":";
 
         try {
             Method method = wifiP2pManager.getClass().getMethod("setDeviceName", WifiP2pManager.Channel.class, String.class, WifiP2pManager.ActionListener.class);
@@ -149,6 +149,11 @@ public class Recieve extends AppCompatActivity {
         unregisterReceiver(wifiBroadcastReciever);
     }
 
+    @Override
+    protected void onStop() {
+        super.onStop();
+    }
+
     WifiP2pManager.ConnectionInfoListener connectionInfoListener = new WifiP2pManager.ConnectionInfoListener() {
         @Override
         public void onConnectionInfoAvailable(WifiP2pInfo info) {
@@ -172,6 +177,8 @@ public class Recieve extends AppCompatActivity {
                 //Toast.makeText(getApplicationContext(), "Not removed error code"+ String.valueOf(reason), Toast.LENGTH_LONG).show();
             }
         });
+        wifiP2pManager.stopPeerDiscovery(channel, null);
+        channel.close();
         Log.v("destroy", "activity destroye");
     }
 

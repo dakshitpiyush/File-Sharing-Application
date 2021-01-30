@@ -55,7 +55,7 @@ public class Connect extends AppCompatActivity {
     private Button retry;
     public TextView message;
     private Profile listAdapter;
-    public ArrayList<String> deviceList = new ArrayList<>();
+    public ArrayList<WifiP2pDevice> deviceList = new ArrayList<>();
     private LocationManager locationManager;
     private static final int[] IND_TO_RES= new int[]{
             R.drawable.profile1,
@@ -103,7 +103,7 @@ public class Connect extends AppCompatActivity {
                 String deviceName=device.deviceName;
                 Log.v("device found",deviceName);
                 String[] userDetail=deviceName.split(":");
-                if(userDetail.length!=3 || !userDetail[0].equals("receiver")) continue;
+                if(userDetail.length<3 || !userDetail[0].contains("receiver")) continue;
                 int profilePicRes=3;
                 try {
                     profilePicRes = Integer.parseInt(userDetail[2]);
@@ -112,7 +112,7 @@ public class Connect extends AppCompatActivity {
                 }
                 deviceNameList.add(userDetail[1]);
                 uphotos.add(IND_TO_RES[profilePicRes]);
-                deviceList.add(device.deviceAddress);
+                deviceList.add(device);
             }
             listAdapter.notifyDataSetChanged();
         }
@@ -145,7 +145,8 @@ public class Connect extends AppCompatActivity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 WifiP2pConfig config = new WifiP2pConfig();
-                config.deviceAddress = deviceList.get(position);
+                WifiP2pDevice curDevice=deviceList.get(position);
+                config.deviceAddress = curDevice.deviceAddress;
                 if (ActivityCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
                     ActivityCompat.requestPermissions((Activity) getApplicationContext(), new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 2);
                 }
@@ -174,7 +175,7 @@ public class Connect extends AppCompatActivity {
         final SharedPreferences prefs = getApplicationContext().getSharedPreferences("my_preferences", Context.MODE_PRIVATE);
         String username=prefs.getString("username", "kahichnahi");
         int profilePic=prefs.getInt("profilePic", 3);
-        String deviceNewName="sender"+":"+username+":"+ profilePic;
+        String deviceNewName="sender"+":"+username+":"+ profilePic+":";
         try {
             Method method = wifiP2pManager.getClass().getMethod("setDeviceName", WifiP2pManager.Channel.class, String.class, WifiP2pManager.ActionListener.class);
 
@@ -277,6 +278,8 @@ public class Connect extends AppCompatActivity {
                 Toast.makeText(getApplicationContext(), "Not removed error code"+ reason, Toast.LENGTH_LONG).show();
             }
         });
+        wifiP2pManager.stopPeerDiscovery(channel, null);
+        channel.close();
         Log.v("destroy", "activity destroye");
     }
 
